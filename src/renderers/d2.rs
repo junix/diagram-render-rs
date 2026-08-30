@@ -50,13 +50,14 @@ fn walk(
                     walk(statements, &id, Some(&id), diagram, warnings);
                 }
                 Some(D2Value::Scalar(value)) if is_property(&entry.key) && owner.is_some() => {
-                    if entry.key != "label"
-                        && let Some(card) = diagram
+                    if entry.key != "label" {
+                        if let Some(card) = diagram
                             .cards
                             .iter_mut()
                             .find(|card| Some(card.id.as_str()) == owner)
-                    {
-                        card.lines.push(format!("{}: {value}", entry.key));
+                        {
+                            card.lines.push(format!("{}: {value}", entry.key));
+                        }
                     }
                 }
                 Some(D2Value::Scalar(value)) => {

@@ -89,19 +89,20 @@ fn walk(
                 walk(&extension.body, Some(&extension.target), diagram, warnings);
             }
             LikeC4Statement::Property(property) => {
-                if let Some(current_element) = current_element
-                    && let Some(card) = diagram
+                if let Some(current_element) = current_element {
+                    if let Some(card) = diagram
                         .cards
                         .iter_mut()
                         .find(|card| card.id == current_element)
-                {
-                    let values = property
-                        .values
-                        .iter()
-                        .map(|value| value.value.as_str())
-                        .collect::<Vec<_>>()
-                        .join(" ");
-                    card.lines.push(format!("{}: {values}", property.name));
+                    {
+                        let values = property
+                            .values
+                            .iter()
+                            .map(|value| value.value.as_str())
+                            .collect::<Vec<_>>()
+                            .join(" ");
+                        card.lines.push(format!("{}: {values}", property.name));
+                    }
                 }
                 walk(&property.body, current_element, diagram, warnings);
             }

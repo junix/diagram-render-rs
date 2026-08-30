@@ -149,18 +149,18 @@ fn draw_timing(
         });
         draw_lane(scene, view.lane, x0, y, max_cells, theme, nodes);
     }
-    if let Some(foot) = &timing.foot
-        && let Some(text) = &foot.text
-    {
-        push_text(
-            scene,
-            Point::new(x0, 96.0 + lanes.len() as f32 * LANE_HEIGHT),
-            text,
-            11.0,
-            TextAnchor::Start,
-            &theme.muted,
-            TextWeight::Normal,
-        );
+    if let Some(foot) = &timing.foot {
+        if let Some(text) = &foot.text {
+            push_text(
+                scene,
+                Point::new(x0, 96.0 + lanes.len() as f32 * LANE_HEIGHT),
+                text,
+                11.0,
+                TextAnchor::Start,
+                &theme.muted,
+                TextWeight::Normal,
+            );
+        }
     }
 }
 

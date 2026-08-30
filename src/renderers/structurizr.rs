@@ -90,16 +90,16 @@ fn walk(
                 walk(&block.body, parent, diagram, warnings);
             }
             StructurizrStatement::Property(property) => {
-                if let Some(parent) = parent
-                    && let Some(card) = diagram.cards.iter_mut().find(|card| card.id == parent)
-                {
-                    let values = property
-                        .values
-                        .iter()
-                        .map(|value| value.value.as_str())
-                        .collect::<Vec<_>>()
-                        .join(" ");
-                    card.lines.push(format!("{}: {values}", property.name));
+                if let Some(parent) = parent {
+                    if let Some(card) = diagram.cards.iter_mut().find(|card| card.id == parent) {
+                        let values = property
+                            .values
+                            .iter()
+                            .map(|value| value.value.as_str())
+                            .collect::<Vec<_>>()
+                            .join(" ");
+                        card.lines.push(format!("{}: {values}", property.name));
+                    }
                 }
                 walk(&property.body, parent, diagram, warnings);
             }

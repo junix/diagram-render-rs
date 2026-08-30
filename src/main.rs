@@ -165,11 +165,11 @@ fn resolve_output_format(requested: FormatArg, output: Option<&Path>) -> OutputF
 
 fn write_output(path: Option<&Path>, bytes: &[u8]) -> std::result::Result<(), String> {
     if let Some(path) = path {
-        if let Some(parent) = path.parent()
-            && !parent.as_os_str().is_empty()
-        {
-            fs::create_dir_all(parent)
-                .map_err(|error| format!("failed to create {}: {error}", parent.display()))?;
+        if let Some(parent) = path.parent() {
+            if !parent.as_os_str().is_empty() {
+                fs::create_dir_all(parent)
+                    .map_err(|error| format!("failed to create {}: {error}", parent.display()))?;
+            }
         }
         return fs::write(path, bytes)
             .map_err(|error| format!("failed to write {}: {error}", path.display()));
