@@ -32,6 +32,7 @@ toolchain for CI.
 
 ## Project-manager status
 
-The project is registered as `diagram-render-rs`. `pm doctor --deep` reports
-only the expected missing `origin` and upstream branch because no remote was
-requested for this local project.
+The project is registered as `diagram-render-rs`, with `origin` and the
+upstream `main` branch configured at
+<https://github.com/junix/diagram-render-rs>. `pm doctor --deep` passes all
+environment and project checks.
