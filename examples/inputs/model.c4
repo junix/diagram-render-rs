@@ -1,0 +1,23 @@
+specification {
+  element actor
+  element system
+  element component
+  relationship async
+}
+
+model {
+  customer = actor 'Customer'
+  cloud = system 'Cloud' {
+    api = component 'API'
+    worker = component 'Worker'
+    api -[async]-> worker 'publishes jobs'
+  }
+  customer -> cloud 'Uses'
+}
+
+views {
+  view index {
+    title 'Cloud overview'
+    include *
+  }
+}

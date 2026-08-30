@@ -1,0 +1,7 @@
+right
+Client: box "Client" fit
+arrow right 150%
+Api: box "API" "(Rust)" fit
+arrow right 150%
+Db: cylinder "PostgreSQL" fit
+spacing = 0.2in

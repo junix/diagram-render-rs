@@ -1,0 +1,29 @@
+Project commerce {
+  database_type: 'PostgreSQL'
+  Note: 'Core commerce schema'
+}
+
+Table public.users as U [note: 'Accounts'] {
+  id bigint [pk, increment]
+  email varchar(255) [not null, unique]
+  status public.user_status [not null, default: 'active']
+  created_at timestamp [default: `now()`]
+
+  Indexes {
+    email [name: 'users_email_idx', unique]
+    (status, created_at) [name: 'users_status_created_idx']
+  }
+}
+
+Table public.orders {
+  id bigint [pk]
+  user_id bigint [not null]
+  total decimal(12, 2) [not null]
+}
+
+Enum public.user_status {
+  active
+  disabled [note: 'Login disabled']
+}
+
+Ref user_orders: public.users.id < public.orders.user_id [delete: cascade]

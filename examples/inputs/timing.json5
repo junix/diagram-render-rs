@@ -1,0 +1,13 @@
+{
+  signal: [
+    { name: 'clk', wave: 'p.......' },
+    [
+      'bus',
+      { name: 'data', wave: 'x.345x..', data: ['head', 'body', 'tail'] },
+      { name: 'valid', wave: '0.1..0..', node: '..a..b..' },
+    ],
+  ],
+  edge: ['a~>b transfer'],
+  head: { text: 'Bus transaction', tick: 0, every: 2 },
+  config: { hscale: 2 },
+}
