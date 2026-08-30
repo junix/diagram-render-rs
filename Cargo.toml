@@ -1,0 +1,11 @@
+[package]
+name = "diagram-render-rs"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Render typed diagram ASTs to SVG and PNG"
+repository = "https://github.com/junix/diagram-render-rs"
+
+[dependencies]
+
+[dev-dependencies]

@@ -1,0 +1,18 @@
+/target/
+**/*.rs.bk
+*.pdb
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Coverage / profiling
+tarpaulin-report.html
+cobertura.xml
+lcov.info
+flamegraph.svg
+perf.data
+perf.data.old
