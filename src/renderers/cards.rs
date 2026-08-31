@@ -211,7 +211,15 @@ fn draw_connectors(
         } else {
             Stroke::solid(theme.line.clone(), 1.6)
         };
-        let points = connector_points(from_rect, to_rect);
+        let label = connector
+            .label
+            .as_deref()
+            .filter(|label| !label.is_empty())
+            .map(|label| truncate(label, 34));
+        let label_width = label.as_deref().map_or(0.0, |label| {
+            (label.width() as f32 * 7.1 + 18.0).clamp(46.0, 250.0)
+        });
+        let points = connector_points(from_rect, to_rect, label_width);
         scene.push(Primitive::Polyline {
             points: points.clone(),
             stroke,
@@ -236,10 +244,8 @@ fn draw_connectors(
         ) {
             draw_arrowhead(scene, start, start_neighbor, &theme.line);
         }
-        if let Some(label) = connector.label.as_deref().filter(|label| !label.is_empty()) {
+        if let Some(label) = label {
             let middle = polyline_middle(&points);
-            let label = truncate(label, 34);
-            let label_width = (label.width() as f32 * 7.1 + 18.0).clamp(46.0, 250.0);
             scene.push(Primitive::Rect {
                 rect: Rect::new(
                     middle.x - label_width / 2.0,
@@ -325,7 +331,7 @@ fn draw_card(scene: &mut Scene, card: &Card, rect: Rect, lines: &[String], theme
     }
 }
 
-fn connector_points(from: Rect, to: Rect) -> Vec<Point> {
+fn connector_points(from: Rect, to: Rect, label_width: f32) -> Vec<Point> {
     if from == to {
         let top = Point::new(from.x + from.width * 0.65, from.y);
         return vec![
@@ -338,6 +344,25 @@ fn connector_points(from: Rect, to: Rect) -> Vec<Point> {
     }
     let from_center = from.center();
     let to_center = to.center();
+    let vertical_overlap = from.y < to.y + to.height && to.y < from.y + from.height;
+    let horizontal_gap = if from.x + from.width <= to.x {
+        to.x - (from.x + from.width)
+    } else if to.x + to.width <= from.x {
+        from.x - (to.x + to.width)
+    } else {
+        0.0
+    };
+    if vertical_overlap && label_width > horizontal_gap - 16.0 {
+        let start = Point::new(from_center.x, from.y + from.height);
+        let end = Point::new(to_center.x, to.y + to.height);
+        let route_y = start.y.max(end.y) + Y_GAP * 0.30;
+        return vec![
+            start,
+            Point::new(start.x, route_y),
+            Point::new(end.x, route_y),
+            end,
+        ];
+    }
     let start = rect_boundary(from, to_center);
     let end = rect_boundary(to, from_center);
     if (start.x - end.x).abs() < 1.0 || (start.y - end.y).abs() < 1.0 {
@@ -394,7 +419,34 @@ fn draw_arrowhead(scene: &mut Scene, tip: Point, previous: Point, color: &str) {
 }
 
 fn polyline_middle(points: &[Point]) -> Point {
-    points.get(points.len() / 2).copied().unwrap_or_default()
+    if points.len() < 2 {
+        return points.first().copied().unwrap_or_default();
+    }
+    let total = points
+        .windows(2)
+        .map(|pair| segment_length(pair[0], pair[1]))
+        .sum::<f32>();
+    let mut remaining = total / 2.0;
+    for pair in points.windows(2) {
+        let length = segment_length(pair[0], pair[1]);
+        if remaining <= length {
+            let ratio = if length <= f32::EPSILON {
+                0.0
+            } else {
+                remaining / length
+            };
+            return Point::new(
+                pair[0].x + (pair[1].x - pair[0].x) * ratio,
+                pair[0].y + (pair[1].y - pair[0].y) * ratio,
+            );
+        }
+        remaining -= length;
+    }
+    points.last().copied().unwrap_or_default()
+}
+
+fn segment_length(from: Point, to: Point) -> f32 {
+    ((to.x - from.x).powi(2) + (to.y - from.y).powi(2)).sqrt()
 }
 
 pub(crate) fn push_text(
@@ -457,4 +509,33 @@ pub(crate) fn wrap(value: &str, max_width: usize) -> Vec<String> {
 
 fn display_id(id: &str) -> String {
     id.rsplit(['.', '/']).next().unwrap_or(id).to_owned()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn wide_same_row_labels_route_through_the_row_gap() {
+        let left = Rect::new(42.0, 72.0, CARD_WIDTH, 211.0);
+        let right = Rect::new(392.0, 72.0, CARD_WIDTH, 135.0);
+        let points = connector_points(left, right, 216.0);
+        assert_eq!(points.len(), 4);
+        assert!(points[1].y > left.y + left.height);
+        assert_eq!(points[1].y, points[2].y);
+        let label = polyline_middle(&points);
+        assert!(label.y > left.y + left.height);
+        assert!(label.x > left.x + left.width && label.x < right.x);
+    }
+
+    #[test]
+    fn polyline_middle_uses_distance_instead_of_vertex_index() {
+        let points = [
+            Point::new(0.0, 0.0),
+            Point::new(0.0, 10.0),
+            Point::new(100.0, 10.0),
+            Point::new(100.0, 20.0),
+        ];
+        assert_eq!(polyline_middle(&points), Point::new(50.0, 10.0));
+    }
 }

@@ -1,0 +1,6 @@
+#direction: right
+#font: Inter
+#.service: visual=roundrect fill=#eef4ff
+
+[<actor id=user>User] -> [<service id=api>API|+charge(): Result]
+[api] --> [<database id=db>PostgreSQL|payments; customers]

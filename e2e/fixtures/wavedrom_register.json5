@@ -1,0 +1,8 @@
+{
+  reg: [
+    { bits: 4, name: 'opcode' },
+    { bits: 3, name: 'mode' },
+    { bits: 1, name: 'valid' },
+    { bits: 8, name: 'payload' },
+  ],
+}

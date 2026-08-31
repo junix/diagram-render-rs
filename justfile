@@ -11,6 +11,21 @@ build-release:
 test:
     cargo test --all-targets --all-features
 
+e2e-test:
+    cd e2e && go test ./...
+
+e2e: build
+    cd e2e && go run . --diagram-render "{{ target_dir }}/debug/diagram-render-rs" run
+
+e2e-doctor:
+    cd e2e && go run . doctor
+
+e2e-list:
+    cd e2e && go run . list
+
+e2e-matrix:
+    cd e2e && go run . matrix
+
 check:
     cargo check --all-targets --all-features
 
@@ -23,7 +38,7 @@ fmt-check:
 clippy:
     cargo clippy --all-targets --all-features -- -D warnings
 
-check-all: fmt-check clippy test
+check-all: fmt-check clippy test e2e-test e2e
 
 # Render all seven typed-AST examples to SVG and 2x transparent PNG, then
 # generate a browser-viewable gallery from the public library API.

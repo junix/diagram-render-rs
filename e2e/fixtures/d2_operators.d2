@@ -1,0 +1,19 @@
+direction: right
+
+alpha: Alpha
+beta: Beta
+gamma
+delta: Delta
+
+cluster: {
+  label: Service Group
+  shape: package
+  tooltip: Nested container
+  worker: Worker
+}
+
+alpha -> beta: directed
+beta <- gamma: reverse
+gamma -- delta: undirected
+delta <-> alpha: bidirectional
+alpha -> beta -> gamma: chained

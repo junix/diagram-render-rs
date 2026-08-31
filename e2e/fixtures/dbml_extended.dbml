@@ -1,0 +1,45 @@
+Project feature_matrix {
+  database_type: 'PostgreSQL'
+}
+
+TablePartial audit_columns {
+  created_at timestamp [not null]
+  updated_at timestamp
+}
+
+Table core.accounts as A [note: 'Account records'] {
+  id bigint [pk]
+  email varchar(255) [not null, unique]
+  status core.account_status [not null]
+  ~audit_columns
+  Note: 'Primary account table'
+  indexes {
+    email [unique, name: 'accounts_email_idx']
+  }
+  checks {
+    `id > 0` [name: 'positive_id']
+  }
+}
+
+Table core.memberships {
+  id bigint [pk]
+  account_id bigint [not null]
+  peer_id bigint
+  manager_id bigint
+  sponsor_id bigint
+}
+
+Enum core.account_status {
+  active
+  suspended
+}
+
+TableGroup identity {
+  core.accounts
+  core.memberships
+}
+
+Ref many_to_one: core.memberships.account_id > A.id
+Ref one_to_many: A.id < core.memberships.peer_id
+Ref one_to_one: A.id - core.memberships.manager_id
+Ref many_to_many: A.id <> core.memberships.sponsor_id

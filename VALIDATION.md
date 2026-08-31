@@ -6,12 +6,27 @@ toolchain for CI.
 
 ## Automated gates
 
-- `just check-all`: passed (`rustfmt`, Clippy with `-D warnings`, and all
-  targets/tests).
-- Test result: 8 integration tests passed. These cover all seven AST families,
+- `just check-all`: passed (`rustfmt`, Clippy with `-D warnings`, all Rust
+  targets/tests, the Go E2E harness tests, and live original-CLI parity).
+- Test result: 14 Rust tests passed (4 renderer unit tests and 10 integration
+  tests). These cover all seven AST families,
   SVG accessibility/escaping, transparent and explicitly painted canvases,
   PNG decoding, exact-width rasterization, serialized-AST input, bounded
   raster options, CLI output selection, and the checked-in gallery artifacts.
+- The independent Go harness passed 12 unit tests covering its executable
+  feature matrix, bidirectional matrix/registry guards, selectors, fixture
+  coverage, deterministic environment, normalized image comparator, SVG text
+  extraction, panic recovery, command dispatch, global flags, and drift
+  semantics.
+- Live parity passed 15/15 cases against the installed
+  `plot-provider-diagrams` CLI: 14 parity cases covering the 68 aligned matrix
+  rows across DBML, WaveDrom, D2, Structurizr, LikeC4, nomnoml, and Pikchr,
+  plus shared malformed-DBML rejection. The matrix separately records 45
+  intentional exclusions. `doctor` confirmed that both CLIs and all seven
+  original backends were available.
+- A negative probe replaced `diagram-render-rs` with `/usr/bin/true`; `PAR-003`
+  failed with harness exit 1 and retained the case ID, assertion, both argv and
+  exit values, and bounded subprocess evidence.
 - `cargo doc --no-deps`: passed.
 - `cargo machete`: no unused dependencies.
 - `just examples`: regenerated seven SVGs, seven RGBA PNGs, and

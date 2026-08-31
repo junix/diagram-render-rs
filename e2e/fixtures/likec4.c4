@@ -1,0 +1,48 @@
+specification {
+  element person {
+    style {
+      shape person
+    }
+  }
+  element service
+  element storage {
+    style {
+      shape storage
+    }
+  }
+}
+
+model {
+  customer = person 'Customer' 'Orders coffee'
+  barista = person 'Barista' 'Prepares orders'
+
+  pos = service 'POS' 'Tablet app at the counter'
+  api = service 'Coffee API' 'Takes orders' {
+    technology 'Rust'
+  }
+  payments = service 'Payments' 'Charges cards'
+  ledger = storage 'Ledger' 'Order history'
+
+  extend api {
+    worker = service 'Worker' 'Runs background jobs'
+  }
+
+  customer -> pos 'places order at'
+  barista -> pos 'marks ready in'
+  pos -> api 'submits'
+  api -> payments 'charges via'
+  api -> ledger 'appends to'
+  payments -> ledger 'settles in'
+}
+
+views {
+  view index {
+    title 'Landscape'
+    include *
+  }
+  view parity of api {
+    title 'Coffee API in context'
+    include *
+    autoLayout LeftRight
+  }
+}

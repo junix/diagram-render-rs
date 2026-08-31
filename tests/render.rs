@@ -125,3 +125,62 @@ fn svg_text_is_xml_escaped() {
     assert!(rendered.svg.contains("&lt;unsafe &amp; visible&gt;"));
     assert!(!rendered.svg.contains(">unsafe & visible<"));
 }
+
+#[test]
+fn implemented_feature_surface_retains_value_sensitive_details() {
+    let dbml = render_source(
+        DiagramFormat::Dbml,
+        include_str!("../e2e/fixtures/dbml_extended.dbml"),
+        OutputFormat::Svg,
+        &RenderOptions::default(),
+    )
+    .expect("extended DBML render");
+    for cardinality in ["N:1", "1:N", "1:1", "N:N"] {
+        assert!(dbml.svg.contains(cardinality), "missing {cardinality}");
+    }
+
+    let wavedrom = render_source(
+        DiagramFormat::WaveDrom,
+        include_str!("../e2e/fixtures/wavedrom_symbols.json5"),
+        OutputFormat::Svg,
+        &RenderOptions::default(),
+    )
+    .expect("WaveDrom symbol render");
+    assert!(wavedrom.svg.contains("transfer"));
+    assert!(wavedrom.svg.contains("End of symbols"));
+
+    let pikchr = render_source(
+        DiagramFormat::Pikchr,
+        include_str!("../e2e/fixtures/pikchr_surface.pikchr"),
+        OutputFormat::Svg,
+        &RenderOptions::default(),
+    )
+    .expect("Pikchr surface render");
+    assert!(
+        pikchr.scene_height > 300.0,
+        "direction changes must expand the canvas"
+    );
+    for label in ["Box", "Circle", "Diamond", "Cylinder", "Down", "Left", "Up"] {
+        assert!(pikchr.svg.contains(label), "missing {label}");
+    }
+}
+
+#[test]
+fn d2_edge_operators_keep_their_arrowhead_cardinality() {
+    for (source, expected_arrowheads) in
+        [("a -> b", 1), ("a <- b", 1), ("a -- b", 0), ("a <-> b", 2)]
+    {
+        let rendered = render_source(
+            DiagramFormat::D2,
+            source,
+            OutputFormat::Svg,
+            &RenderOptions::default(),
+        )
+        .unwrap_or_else(|error| panic!("{source} failed: {error}"));
+        assert_eq!(
+            rendered.svg.matches("<polygon").count(),
+            expected_arrowheads,
+            "{source}"
+        );
+    }
+}

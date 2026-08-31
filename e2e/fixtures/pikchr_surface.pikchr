@@ -1,0 +1,24 @@
+right
+box "Box"
+arrow
+circle "Circle"
+line
+ellipse "Ellipse"
+down
+oval "Oval"
+spline
+diamond "Diamond"
+left
+cylinder "Cylinder"
+arc
+dot "Dot"
+up
+text "Text"
+move
+box "Up"
+right
+box "Right"
+down
+box "Down"
+left
+box "Left"

@@ -1,0 +1,17 @@
+direction: right
+
+client: Client
+api: {
+  label: Payments API
+  shape: rectangle
+  style.fill: "#eef4ff"
+}
+database: {
+  label: PostgreSQL
+  shape: cylinder
+}
+
+client -> api: HTTPS
+api -> database: SQL {
+  style.stroke-dash: 3
+}

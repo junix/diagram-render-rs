@@ -175,32 +175,40 @@ fn draw_lane(
 ) {
     let wave = lane.wave.as_deref().unwrap_or("");
     let mut level = y + 13.0;
-    let mut clock = false;
+    let mut clock_inverted = None;
     let mut data_index = 0usize;
     for (index, symbol) in wave.chars().take(max_cells).enumerate() {
         let left = x0 + index as f32 * CELL_WIDTH;
         let right = left + CELL_WIDTH;
         match symbol {
             '0' | 'l' | 'L' => {
-                clock = false;
+                clock_inverted = None;
                 draw_level(scene, left, right, &mut level, y + 13.0, theme);
             }
             '1' | 'h' | 'H' => {
-                clock = false;
+                clock_inverted = None;
                 draw_level(scene, left, right, &mut level, y - 13.0, theme);
             }
             'p' | 'P' | 'n' | 'N' => {
-                clock = true;
-                draw_clock(scene, left, right, y, symbol == 'n' || symbol == 'N', theme);
+                let inverted = symbol == 'n' || symbol == 'N';
+                clock_inverted = Some(inverted);
+                draw_clock(scene, left, right, y, inverted, theme);
                 level = y;
             }
-            '.' if clock => draw_clock(scene, left, right, y, false, theme),
+            '.' if clock_inverted.is_some() => draw_clock(
+                scene,
+                left,
+                right,
+                y,
+                clock_inverted.unwrap_or_default(),
+                theme,
+            ),
             '.' => {
                 let current = level;
                 draw_level(scene, left, right, &mut level, current, theme);
             }
             'x' | 'X' => {
-                clock = false;
+                clock_inverted = None;
                 scene.push(Primitive::Rect {
                     rect: Rect::new(left + 1.0, y - 14.0, CELL_WIDTH - 2.0, 28.0),
                     radius: 4.0,
@@ -221,7 +229,7 @@ fn draw_lane(
                 level = y;
             }
             'z' | 'Z' => {
-                clock = false;
+                clock_inverted = None;
                 scene.push(Primitive::Line {
                     from: Point::new(left, y),
                     to: Point::new(right, y),
@@ -230,7 +238,7 @@ fn draw_lane(
                 level = y;
             }
             '=' | '2'..='9' => {
-                clock = false;
+                clock_inverted = None;
                 scene.push(Primitive::Rect {
                     rect: Rect::new(left + 1.0, y - 14.0, CELL_WIDTH - 2.0, 28.0),
                     radius: 6.0,
@@ -321,20 +329,20 @@ fn draw_edges(
     warnings: &mut Vec<String>,
 ) {
     for edge in edges {
-        let labels: Vec<char> = edge
-            .chars()
-            .filter(|character| character.is_alphanumeric())
-            .collect();
-        let (Some(from_name), Some(to_name)) = (labels.first(), labels.get(1)) else {
+        let Some((from_name, to_name, label)) = edge_parts(edge) else {
             warnings.push(format!("WaveDrom edge `{edge}` has no two node labels"));
             continue;
         };
-        let (Some(from), Some(to)) = (nodes.get(from_name).copied(), nodes.get(to_name).copied())
+        let (Some(from), Some(to)) = (nodes.get(&from_name).copied(), nodes.get(&to_name).copied())
         else {
             warnings.push(format!("WaveDrom edge `{edge}` references an unknown node"));
             continue;
         };
-        let control_y = from.y.min(to.y) - 22.0;
+        let control_y = if from.y.min(to.y) < 100.0 {
+            from.y.max(to.y) + 18.0
+        } else {
+            from.y.min(to.y) - 11.0
+        };
         scene.push(Primitive::Polyline {
             points: vec![
                 from,
@@ -346,7 +354,28 @@ fn draw_edges(
             fill: None,
         });
         draw_arrowhead(scene, to, Point::new(to.x, control_y), &theme.accent);
+        if !label.is_empty() {
+            push_text(
+                scene,
+                Point::new((from.x + to.x) / 2.0, control_y - 7.0),
+                &truncate(label, 28),
+                10.0,
+                TextAnchor::Middle,
+                &theme.foreground,
+                TextWeight::Normal,
+            );
+        }
     }
+}
+
+fn edge_parts(edge: &str) -> Option<(char, char, &str)> {
+    let mut labels = edge
+        .char_indices()
+        .filter(|(_, character)| character.is_alphanumeric());
+    let (_, from) = labels.next()?;
+    let (to_index, to) = labels.next()?;
+    let label_start = to_index + to.len_utf8();
+    Some((from, to, edge[label_start..].trim()))
 }
 
 fn draw_register(
@@ -384,8 +413,8 @@ fn draw_register(
         scene.push(Primitive::Rect {
             rect: Rect::new(x, y, field_width, 54.0),
             radius: 4.0,
-            fill: Some(theme.series(index).to_owned()),
-            fill_opacity: 0.15,
+            fill: None,
+            fill_opacity: 0.0,
             stroke: Some(Stroke::solid(theme.series(index).to_owned(), 1.3)),
         });
         push_text(
@@ -435,4 +464,50 @@ fn draw_arrowhead(scene: &mut Scene, tip: Point, previous: Point, color: &str) {
         fill_opacity: 1.0,
         stroke: None,
     });
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::BTreeMap;
+
+    use super::*;
+
+    #[test]
+    fn negative_clock_continuation_keeps_its_polarity() {
+        let lane = WaveLane {
+            name: None,
+            wave: Some("n.".to_owned()),
+            data: Vec::new(),
+            node: None,
+            phase: None,
+            period: None,
+            extra: serde_json::Map::new(),
+        };
+        let mut scene = Scene::new(200.0, 100.0, "clock");
+        draw_lane(
+            &mut scene,
+            &lane,
+            0.0,
+            50.0,
+            2,
+            &Theme::light(),
+            &mut BTreeMap::new(),
+        );
+        let starts = scene
+            .primitives
+            .iter()
+            .filter_map(|primitive| match primitive {
+                Primitive::Polyline { points, .. } if points.len() == 5 => Some(points[0].y),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(starts, vec![37.0, 37.0]);
+    }
+
+    #[test]
+    fn edge_parser_separates_node_names_from_the_label() {
+        assert_eq!(edge_parts("a~>b transfer"), Some(('a', 'b', "transfer")));
+        assert_eq!(edge_parts("a-b"), Some(('a', 'b', "")));
+        assert_eq!(edge_parts("a"), None);
+    }
 }

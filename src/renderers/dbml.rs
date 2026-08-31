@@ -130,10 +130,14 @@ pub(crate) fn render(document: &DbmlDocument, theme: &Theme) -> RenderPlan {
             cardinality(reference.cardinality),
             reference.to.columns.join(",")
         );
+        let label = reference
+            .name
+            .as_ref()
+            .map_or_else(|| columns.clone(), |name| format!("{name} · {columns}"));
         diagram.connectors.push(Connector {
             from,
             to,
-            label: reference.name.clone().or(Some(columns)),
+            label: Some(label),
             kind: ConnectorKind::Directed,
             dashed: false,
         });

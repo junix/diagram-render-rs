@@ -1,0 +1,22 @@
+{
+  signal: [
+    [
+      'logic',
+      { name: 'levels', wave: '01hlHL..' },
+      { name: 'clocks', wave: 'p.P.n.N.' },
+    ],
+    [
+      'values',
+      { name: 'states', wave: 'xXzZ....' },
+      {
+        name: 'bus',
+        wave: '=23456789',
+        data: ['D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8'],
+        node: 'a.......b',
+      },
+    ],
+  ],
+  edge: ['a~>b transfer'],
+  head: { text: 'Wave symbol matrix' },
+  foot: { text: 'End of symbols' },
+}

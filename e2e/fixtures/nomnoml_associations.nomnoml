@@ -1,0 +1,8 @@
+#direction: right
+
+[<actor id=a>Alpha|+start()] -> [<service id=b>Beta|+handle()]
+[b] <- [<database id=c>Gamma|records]
+[c] -- [<state id=d>Delta|ready]
+[d] <-> [a]
+[a] --> [c]
+[b] one -> many [d]

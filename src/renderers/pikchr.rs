@@ -8,20 +8,17 @@ use super::cards::{push_text, truncate};
 use crate::Theme;
 use crate::scene::{Point, Primitive, Rect, Scene, Stroke, TextAnchor, TextWeight};
 
+const SHAPE_ADVANCE: f32 = 190.0;
+const FLOW_ADVANCE: f32 = 170.0;
+const CONTENT_LEFT: f32 = 110.0;
+const CONTENT_TOP: f32 = 100.0;
+const CONTENT_RIGHT: f32 = 70.0;
+const CONTENT_BOTTOM: f32 = 60.0;
+
 pub(crate) fn render(document: &PikchrDocument, theme: &Theme) -> RenderPlan {
-    let shape_count = document
-        .statements
-        .iter()
-        .filter(|statement| match &statement.node {
-            PikchrStatement::Object(object) => !matches!(
-                object.object_type.to_ascii_lowercase().as_str(),
-                "arrow" | "line" | "spline" | "arc" | "move"
-            ),
-            _ => false,
-        })
-        .count();
-    let width = (shape_count as f32 * 190.0 + 160.0).clamp(700.0, 1600.0);
-    let height = 300.0;
+    let layout = layout(document);
+    let width = (layout.max_x - layout.min_x + CONTENT_LEFT + CONTENT_RIGHT).max(700.0);
+    let height = (layout.max_y - layout.min_y + CONTENT_TOP + CONTENT_BOTTOM).max(300.0);
     let mut scene = Scene::new(width, height, "Pikchr geometric scene");
     push_text(
         &mut scene,
@@ -32,7 +29,7 @@ pub(crate) fn render(document: &PikchrDocument, theme: &Theme) -> RenderPlan {
         &theme.foreground,
         TextWeight::Bold,
     );
-    let mut cursor = Point::new(125.0, 165.0);
+    let mut cursor = Point::new(CONTENT_LEFT - layout.min_x, CONTENT_TOP - layout.min_y);
     let mut direction = PikchrDirection::Right;
     let mut previous_was_shape = false;
     let mut warnings = Vec::new();
@@ -58,7 +55,7 @@ pub(crate) fn render(document: &PikchrDocument, theme: &Theme) -> RenderPlan {
                     previous_was_shape = false;
                 } else {
                     if previous_was_shape {
-                        cursor = advance(cursor, direction, 190.0);
+                        cursor = advance(cursor, direction, SHAPE_ADVANCE);
                     }
                     draw_shape(&mut scene, object, cursor, theme);
                     previous_was_shape = true;
@@ -80,6 +77,71 @@ pub(crate) fn render(document: &PikchrDocument, theme: &Theme) -> RenderPlan {
         }
     }
     RenderPlan { scene, warnings }
+}
+
+#[derive(Clone, Copy, Debug)]
+struct LayoutBounds {
+    min_x: f32,
+    min_y: f32,
+    max_x: f32,
+    max_y: f32,
+}
+
+impl LayoutBounds {
+    fn around(point: Point) -> Self {
+        Self {
+            min_x: point.x - 80.0,
+            min_y: point.y - 52.0,
+            max_x: point.x + 80.0,
+            max_y: point.y + 52.0,
+        }
+    }
+
+    fn include_shape(&mut self, point: Point) {
+        self.min_x = self.min_x.min(point.x - 80.0);
+        self.min_y = self.min_y.min(point.y - 52.0);
+        self.max_x = self.max_x.max(point.x + 80.0);
+        self.max_y = self.max_y.max(point.y + 52.0);
+    }
+
+    fn include_flow(&mut self, from: Point, to: Point) {
+        self.min_x = self.min_x.min(from.x.min(to.x) - 8.0);
+        self.min_y = self.min_y.min(from.y.min(to.y) - 8.0);
+        self.max_x = self.max_x.max(from.x.max(to.x) + 8.0);
+        self.max_y = self.max_y.max(from.y.max(to.y) + 8.0);
+    }
+}
+
+fn layout(document: &PikchrDocument) -> LayoutBounds {
+    let mut cursor = Point::default();
+    let mut bounds = LayoutBounds::around(cursor);
+    let mut direction = PikchrDirection::Right;
+    let mut previous_was_shape = false;
+    for statement in &document.statements {
+        match &statement.node {
+            PikchrStatement::Direction(next) => direction = *next,
+            PikchrStatement::Object(object) => {
+                let object_type = object.object_type.to_ascii_lowercase();
+                if matches!(
+                    object_type.as_str(),
+                    "arrow" | "line" | "spline" | "arc" | "move"
+                ) {
+                    let end = advance(cursor, direction, FLOW_ADVANCE);
+                    bounds.include_flow(cursor, end);
+                    cursor = end;
+                    previous_was_shape = false;
+                } else {
+                    if previous_was_shape {
+                        cursor = advance(cursor, direction, SHAPE_ADVANCE);
+                    }
+                    bounds.include_shape(cursor);
+                    previous_was_shape = true;
+                }
+            }
+            _ => {}
+        }
+    }
+    bounds
 }
 
 fn draw_shape(scene: &mut Scene, object: &PikchrObject, center: Point, theme: &Theme) {
@@ -174,7 +236,7 @@ fn draw_flow_object(
     direction: PikchrDirection,
     theme: &Theme,
 ) {
-    let end = advance(*cursor, direction, 170.0);
+    let end = advance(*cursor, direction, FLOW_ADVANCE);
     if object_type != "move" {
         let visible_start = advance(*cursor, direction, 75.0);
         let visible_end = advance(end, direction, -75.0);

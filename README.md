@@ -125,9 +125,20 @@ open examples/rendered/index.html
 Run the full local gate:
 
 ```console
-just check-all   # rustfmt + strict Clippy + all targets/tests
+just check-all   # Rust gates + harness tests + original-CLI parity E2E
 just install     # ~/sync/<os>-<arch>-bin/diagram-render-rs
 ```
+
+The independent [`e2e/`](e2e/) harness compares this CLI with the original
+`plot-provider-diagrams` compatibility CLI across all seven source languages.
+It checks shared acceptance, semantic SVG labels where the original supports
+SVG, participant-specific value labels, decoded PNG structure, and shared
+invalid-input rejection. Its executable
+[`feature_matrix.json`](e2e/feature_matrix.json) binds 68 aligned features to
+14 parity cases and records 45 intentional exclusions instead of presenting
+candidate-only or unsupported semantics as parity. Run `just e2e-doctor` to
+resolve both CLIs and the original backend toolchain, `just e2e-list` to inspect
+all 15 cases, or `just e2e-matrix` for the per-language alignment totals.
 
 The parser dependency is an exact Git revision, rather than a local path, so
 the project remains an independently reproducible repository.
