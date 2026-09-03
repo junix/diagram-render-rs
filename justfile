@@ -60,7 +60,7 @@ check-themes: build-release
         diagram-theme check-output --theme "$theme" --svg "$work/out.svg" --png "$work/out.png"
     done
 
-check-all: fmt-check clippy test e2e-test e2e
+check-all: fmt-check clippy test check-themes e2e-test e2e
 
 # Render all seven typed-AST examples to SVG and 2x transparent PNG, then
 # generate a browser-viewable gallery from the public library API.
