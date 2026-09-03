@@ -204,10 +204,19 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "diagram-ast-parser",
+ "diagram-theme",
  "resvg",
  "serde_json",
  "thiserror",
  "unicode-width",
+]
+
+[[package]]
+name = "diagram-theme"
+version = "0.1.0"
+source = "git+https://github.com/junix/diagram-theme-rs.git?rev=1f77cb8f19804ba03668fb3598a550c54c38cb9b#1f77cb8f19804ba03668fb3598a550c54c38cb9b"
+dependencies = [
+ "clap",
 ]
 
 [[package]]

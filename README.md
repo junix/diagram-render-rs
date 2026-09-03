@@ -65,6 +65,31 @@ diagram-render-rs workspace.dsl -f structurizr -o workspace.png \
   --background '#ffffff' --theme light
 ```
 
+## Themes
+
+`-t/--theme` takes the fourteen names of the shared
+[`diagram-theme`](https://github.com/junix/diagram-theme-rs) registry (ADR-1137)
+— `azure`, `mist-blue`, `sage`, `stone-teal`, `dusty-violet`, `warm-sand`,
+`olive-paper`, each also as `<name>-dark` — spelled identically in all five
+renderers. This binary additionally keeps accepting `light` and `dark`, its own
+palettes from before the registry; they are never listed, never aliased onto a
+family, and `light` is still the default.
+
+```console
+diagram-render-rs themes          # the fourteen names, one per line
+diagram-render-rs themes --json   # families, this renderer's profile, all tokens
+```
+
+`themes` is matched ahead of the flag parser instead of being a subcommand,
+because the first positional argument is the input path. The cost is that an
+input file actually named `themes` has to be spelled `./themes`.
+
+A theme never paints a canvas. `--paper` is the page colour the palette was
+contrast-checked against, not a paint instruction, and `--background` remains
+the only way to fill one. Choosing a `-dark` theme asserts that the host page is
+dark; the file itself does not adapt, and the knock-outs it draws inherit that
+assertion.
+
 If a pipeline already has the serialized parser AST, skip source parsing:
 
 ```console
@@ -72,8 +97,8 @@ diagram-parse source.dbml --format dbml > document.ast.json
 diagram-render-rs document.ast.json --ast-json -o document.svg
 ```
 
-Run `diagram-render-rs --help` for all options, including dark theme,
-font-family override, exact PNG width, stdin/stdout, and explicit `-T svg|png`.
+Run `diagram-render-rs --help` for all options, including font-family override,
+exact PNG width, stdin/stdout, and explicit `-T svg|png`.
 
 ## Library
 

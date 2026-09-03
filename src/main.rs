@@ -3,16 +3,19 @@ use std::io::{self, Read as _, Write as _};
 use std::path::{Path, PathBuf};
 
 use clap::{Parser, ValueEnum};
+use diagram_render_rs::theme::{LEGACY, PROFILE};
 use diagram_render_rs::{
-    DiagramFormat, Document, OutputFormat, RenderOptions, ThemePreset, render_document,
-    render_source,
+    DiagramFormat, Document, OutputFormat, RenderOptions, Theme, render_document, render_source,
 };
+use diagram_theme::Resolved;
+use diagram_theme::cli::{AFTER_HELP, THEME_HELP, listing_json, listing_plain, theme_value_parser};
 
 #[derive(Debug, Parser)]
 #[command(
     name = "diagram-render-rs",
     version,
-    about = "Render typed DBML, WaveDrom, D2, Structurizr, LikeC4, nomnoml, and Pikchr ASTs to SVG or PNG"
+    about = "Render typed DBML, WaveDrom, D2, Structurizr, LikeC4, nomnoml, and Pikchr ASTs to SVG or PNG",
+    after_help = AFTER_HELP
 )]
 struct Cli {
     /// Input source/AST JSON file, or `-` for stdin.
@@ -35,9 +38,18 @@ struct Cli {
     #[arg(short = 'T', long, value_enum, default_value_t = FormatArg::Auto)]
     output_format: FormatArg,
 
-    /// Built-in light or dark palette.
-    #[arg(long, value_enum, default_value_t = ThemeArg::Light)]
-    theme: ThemeArg,
+    // The help text is a shared constant so all five renderers print the same
+    // sentence; possible values are hidden because `themes` is where the
+    // fourteen names are enumerated.
+    #[arg(
+        short = 't',
+        long,
+        value_parser = theme_value_parser(LEGACY, "diagram-render-rs"),
+        default_value = "light",
+        help = THEME_HELP,
+        hide_possible_values = true
+    )]
+    theme: Resolved,
 
     /// Optional SVG/PNG canvas color. Omit for transparency.
     #[arg(long)]
@@ -68,14 +80,26 @@ enum FormatArg {
     Png,
 }
 
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, ValueEnum)]
-enum ThemeArg {
-    #[default]
-    Light,
-    Dark,
-}
-
 fn main() {
+    // `themes` is matched ahead of clap rather than modelled as a subcommand:
+    // the first positional is the input path, so a subcommand would turn the
+    // bare `diagram-render-rs schema.dbml` form used by the README examples and
+    // the e2e harness into an unknown-subcommand error. Known cost, accepted:
+    // an input file actually named `themes` now has to be spelled `./themes`.
+    let argv: Vec<std::ffi::OsString> = std::env::args_os().skip(1).collect();
+    let words: Vec<Option<&str>> = argv.iter().map(|arg| arg.to_str()).collect();
+    match words.as_slice() {
+        [Some("themes")] => {
+            print!("{}", listing_plain());
+            return;
+        }
+        [Some("themes"), Some("--json")] => {
+            print!("{}", listing_json(&PROFILE));
+            return;
+        }
+        _ => {}
+    }
+
     if let Err(error) = run(Cli::parse()) {
         eprintln!("diagram-render-rs: {error}");
         std::process::exit(1);
@@ -85,11 +109,7 @@ fn main() {
 fn run(cli: Cli) -> std::result::Result<(), String> {
     let input = read_input(&cli.input)?;
     let output_format = resolve_output_format(cli.output_format, cli.output.as_deref());
-    let preset = match cli.theme {
-        ThemeArg::Light => ThemePreset::Light,
-        ThemeArg::Dark => ThemePreset::Dark,
-    };
-    let mut theme = preset.resolve();
+    let mut theme = Theme::resolved(cli.theme);
     if let Some(font_family) = cli.font_family {
         theme.font_family = font_family;
     }
