@@ -16,3 +16,5 @@ lcov.info
 flamegraph.svg
 perf.data
 perf.data.old
+# --- appended by gitignore-sweep on 2026-09-03 ---
+Cargo.lock
