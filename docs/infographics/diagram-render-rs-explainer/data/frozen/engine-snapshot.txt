@@ -1,0 +1,9 @@
+# One-time frozen engine snapshot (never regenerated).
+captured-utc: 2026-09-05T14:20:03Z
+engine-HEAD: b38ba079257a530691b8d2c700586fee5fb810ef
+engine-porcelain-at-capture: ?? docs/
+uname: Darwin 25.5.0 arm64
+macos: 26.5
+rustc: rustc 1.98.0 (88d9e12ae 2026-08-18) (Homebrew)
+cargo: cargo 1.98.0 (797e8a9bc 2026-08-05) (Homebrew)
+cargo-lock-sha256: 90aa2ca932524022533d99aa7eaa7b3fdbefbb2e3b507c9cfdb9f629b84584e5

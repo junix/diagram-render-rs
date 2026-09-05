@@ -1,0 +1,552 @@
+# Real CLI surface transcripts (release binary from the frozen build)
+$ diagram-render-rs --version
+diagram-render-rs 0.1.0
+exit-code: 0
+
+$ diagram-render-rs --help
+Render typed DBML, WaveDrom, D2, Structurizr, LikeC4, nomnoml, and Pikchr ASTs to SVG or PNG
+
+Usage: diagram-render-rs [OPTIONS] [INPUT]
+
+Arguments:
+  [INPUT]  Input source/AST JSON file, or `-` for stdin [default: -]
+
+Options:
+  -o, --output <OUTPUT>                Output path. Without it, image bytes are written to stdout
+  -f, --format <FORMAT>                Source language. Ignored for --ast-json [default: auto]
+      --ast-json                       Treat input as serialized diagram_ast_parser::ast::Document JSON
+  -T, --output-format <OUTPUT_FORMAT>  Output format. `auto` uses the output extension and otherwise SVG [default: auto] [possible values: auto, svg, png]
+  -t, --theme <THEME>                  Colour palette: azure, mist-blue, sage, stone-teal, dusty-violet, warm-sand, olive-paper — each also as <name>-dark. Run `<bin> themes` for the full list. [default: light]
+      --background <BACKGROUND>        Optional SVG/PNG canvas color. Omit for transparency
+      --font-family <FONT_FAMILY>      Override the SVG font-family stack
+      --scale <SCALE>                  PNG pixel scale. Ignored for SVG and when --width is supplied [default: 2]
+      --width <WIDTH>                  Exact PNG output width in pixels
+  -q, --quiet                          Suppress output summaries and non-fatal renderer warnings
+  -h, --help                           Print help
+  -V, --version                        Print version
+
+Themes never paint a canvas: SVG and PNG output is transparent. A -dark theme is you asserting the host page is dark; the file does not adapt. Knock-outs — label halos, arrowhead interiors, opaque panels — are marks in the theme's page colour and inherit that assertion.
+exit-code: 0
+
+$ diagram-render-rs themes
+azure
+azure-dark
+mist-blue
+mist-blue-dark
+sage
+sage-dark
+stone-teal
+stone-teal-dark
+dusty-violet
+dusty-violet-dark
+warm-sand
+warm-sand-dark
+olive-paper
+olive-paper-dark
+exit-code: 0
+
+$ diagram-render-rs themes --json
+{
+  "schema": "diagram-theme/v1",
+  "registry_version": "1.0.0",
+  "renderer": "diagram-render-rs",
+  "renderer_version": "0.1.0",
+  "default": "light",
+  "families": ["azure", "mist-blue", "sage", "stone-teal", "dusty-violet", "warm-sand", "olive-paper"],
+  "unmapped": ["--faint", "--paper", "--line", "--accent-ink", "--group-line"],
+  "knockout_role": "--group",
+  "themes": [
+    {
+      "name": "azure",
+      "family": "azure",
+      "mode": "light",
+      "canonical": true,
+      "label": "蔚蓝",
+      "description": "蓝色锚定的基准主题（accent #2563EB / dark #5B8DEF），全部图型的参照系",
+      "tokens": {
+        "--ink": "#192028",
+        "--muted": "#495460",
+        "--faint": "#737d89",
+        "--grid": "#dbe0e6",
+        "--paper": "#f2f5f8",
+        "--panel": "#fcfdff",
+        "--line": "#bbc3cd",
+        "--accent": "#2563eb",
+        "--accent-ink": "#0c3fb2",
+        "--accent-soft": "#e7f0ff",
+        "--edge": "#657383",
+        "--group": "#dbe1e8",
+        "--group-line": "#b1bbce",
+        "--s1": "#2563eb",
+        "--s2": "#138b90",
+        "--s3": "#304673",
+        "--s4": "#62b4b8",
+        "--s5": "#b3782e",
+        "--s6": "#a34946",
+        "--s7": "#3c7b50",
+        "--s8": "#90969d",
+        "--pos": "#3c7b50",
+        "--warn": "#b3782e",
+        "--neg": "#a34946"
+      }
+    },
+    {
+      "name": "azure-dark",
+      "family": "azure",
+      "mode": "dark",
+      "canonical": true,
+      "label": "蔚蓝",
+      "description": "蓝色锚定的基准主题（accent #2563EB / dark #5B8DEF），全部图型的参照系",
+      "tokens": {
+        "--ink": "#e5eaf0",
+        "--muted": "#aeb7c1",
+        "--faint": "#78818c",
+        "--grid": "#2c3136",
+        "--paper": "#14191e",
+        "--panel": "#282d34",
+        "--line": "#404750",
+        "--accent": "#5b8def",
+        "--accent-ink": "#bbd2fc",
+        "--accent-soft": "#243860",
+        "--edge": "#7f8e9e",
+        "--group": "#1d2228",
+        "--group-line": "#424c5f",
+        "--s1": "#5b8def",
+        "--s2": "#6bb6ba",
+        "--s3": "#b0c8f4",
+        "--s4": "#428e92",
+        "--s5": "#e1ac69",
+        "--s6": "#db8684",
+        "--s7": "#82c393",
+        "--s8": "#7b8187",
+        "--pos": "#82c393",
+        "--warn": "#e1ac69",
+        "--neg": "#db8684"
+      }
+    },
+    {
+      "name": "mist-blue",
+      "family": "mist-blue",
+      "mode": "light",
+      "canonical": true,
+      "label": "雾蓝灰",
+      "description": "冷静、技术感，最通用 —— 适合架构图、流程图、时序图、系统设计",
+      "tokens": {
+        "--ink": "#182026",
+        "--muted": "#48545d",
+        "--faint": "#727e87",
+        "--grid": "#dae1e5",
+        "--paper": "#f1f5f8",
+        "--panel": "#fcfefe",
+        "--line": "#bbc4cb",
+        "--accent": "#336890",
+        "--accent-ink": "#134c72",
+        "--accent-soft": "#e2f1fe",
+        "--edge": "#647480",
+        "--group": "#dbe2e7",
+        "--group-line": "#abbdcd",
+        "--s1": "#336890",
+        "--s2": "#48907b",
+        "--s3": "#234c69",
+        "--s4": "#78b3a0",
+        "--s5": "#b3782e",
+        "--s6": "#a34946",
+        "--s7": "#3c7b50",
+        "--s8": "#90969b",
+        "--pos": "#3c7b50",
+        "--warn": "#b3782e",
+        "--neg": "#a34946"
+      }
+    },
+    {
+      "name": "mist-blue-dark",
+      "family": "mist-blue",
+      "mode": "dark",
+      "canonical": true,
+      "label": "雾蓝灰",
+      "description": "冷静、技术感，最通用 —— 适合架构图、流程图、时序图、系统设计",
+      "tokens": {
+        "--ink": "#e4eaef",
+        "--muted": "#adb7bf",
+        "--faint": "#77828a",
+        "--grid": "#2c3135",
+        "--paper": "#14191d",
+        "--panel": "#272e32",
+        "--line": "#3f484e",
+        "--accent": "#81b1d7",
+        "--accent-ink": "#b3daf9",
+        "--accent-soft": "#243c4f",
+        "--edge": "#7e8f9b",
+        "--group": "#1c2327",
+        "--group-line": "#3b4e5e",
+        "--s1": "#81b1d7",
+        "--s2": "#6cae99",
+        "--s3": "#a2cdf0",
+        "--s4": "#4d8f7b",
+        "--s5": "#e1ac69",
+        "--s6": "#db8684",
+        "--s7": "#82c393",
+        "--s8": "#7b8186",
+        "--pos": "#82c393",
+        "--warn": "#e1ac69",
+        "--neg": "#db8684"
+      }
+    },
+    {
+      "name": "sage",
+      "family": "sage",
+      "mode": "light",
+      "canonical": true,
+      "label": "鼠尾草",
+      "description": "低饱和绿，久看不累 —— 适合节点密集的图，彩色块堆叠不产生视觉噪声",
+      "tokens": {
+        "--ink": "#1c211b",
+        "--muted": "#4d554b",
+        "--faint": "#767f75",
+        "--grid": "#dde1dc",
+        "--paper": "#f3f5f2",
+        "--panel": "#fdfefd",
+        "--line": "#bec5bd",
+        "--accent": "#446f4b",
+        "--accent-ink": "#25532e",
+        "--accent-soft": "#ddf7e0",
+        "--edge": "#6a7568",
+        "--group": "#dee2dd",
+        "--group-line": "#aec0b0",
+        "--s1": "#446f4b",
+        "--s2": "#537ea8",
+        "--s3": "#2c5232",
+        "--s4": "#83a9ce",
+        "--s5": "#b3782e",
+        "--s6": "#a34946",
+        "--s7": "#307c58",
+        "--s8": "#929791",
+        "--pos": "#307c58",
+        "--warn": "#b3782e",
+        "--neg": "#a34946"
+      }
+    },
+    {
+      "name": "sage-dark",
+      "family": "sage",
+      "mode": "dark",
+      "canonical": true,
+      "label": "鼠尾草",
+      "description": "低饱和绿，久看不累 —— 适合节点密集的图，彩色块堆叠不产生视觉噪声",
+      "tokens": {
+        "--ink": "#e7ebe6",
+        "--muted": "#b1b8b0",
+        "--faint": "#7b837a",
+        "--grid": "#2e322d",
+        "--paper": "#161915",
+        "--panel": "#2a2e29",
+        "--line": "#424841",
+        "--accent": "#90bb95",
+        "--accent-ink": "#bae0be",
+        "--accent-soft": "#2a3f2d",
+        "--edge": "#859082",
+        "--group": "#1f231e",
+        "--group-line": "#3f5141",
+        "--s1": "#90bb95",
+        "--s2": "#82acd5",
+        "--s3": "#aad4af",
+        "--s4": "#5b84ab",
+        "--s5": "#e1ac69",
+        "--s6": "#db8684",
+        "--s7": "#79c49c",
+        "--s8": "#7d827c",
+        "--pos": "#79c49c",
+        "--warn": "#e1ac69",
+        "--neg": "#db8684"
+      }
+    },
+    {
+      "name": "stone-teal",
+      "family": "stone-teal",
+      "mode": "light",
+      "canonical": true,
+      "label": "青灰石",
+      "description": "介于蓝绿灰之间，无品牌倾向 —— 通用 diagram 渲染器的默认主题候选",
+      "tokens": {
+        "--ink": "#172221",
+        "--muted": "#475655",
+        "--faint": "#707f7e",
+        "--grid": "#dae1e1",
+        "--paper": "#f1f5f5",
+        "--panel": "#fcfefe",
+        "--line": "#bac5c4",
+        "--accent": "#22716b",
+        "--accent-ink": "#02534f",
+        "--accent-soft": "#d0f9f4",
+        "--edge": "#627675",
+        "--group": "#dae3e2",
+        "--group-line": "#a6c1be",
+        "--s1": "#22716b",
+        "--s2": "#7b73a1",
+        "--s3": "#17524e",
+        "--s4": "#a59ec7",
+        "--s5": "#b3782e",
+        "--s6": "#a34946",
+        "--s7": "#3c7b50",
+        "--s8": "#8f9796",
+        "--pos": "#3c7b50",
+        "--warn": "#b3782e",
+        "--neg": "#a34946"
+      }
+    },
+    {
+      "name": "stone-teal-dark",
+      "family": "stone-teal",
+      "mode": "dark",
+      "canonical": true,
+      "label": "青灰石",
+      "description": "介于蓝绿灰之间，无品牌倾向 —— 通用 diagram 渲染器的默认主题候选",
+      "tokens": {
+        "--ink": "#e4ebeb",
+        "--muted": "#acb9b8",
+        "--faint": "#768382",
+        "--grid": "#2b3231",
+        "--paper": "#131a19",
+        "--panel": "#262e2e",
+        "--line": "#3e4948",
+        "--accent": "#78bdb6",
+        "--accent-ink": "#abe1db",
+        "--accent-soft": "#1c403d",
+        "--edge": "#7c918f",
+        "--group": "#1c2323",
+        "--group-line": "#35524f",
+        "--s1": "#78bdb6",
+        "--s2": "#a8a0d4",
+        "--s3": "#94d6cf",
+        "--s4": "#8178aa",
+        "--s5": "#e1ac69",
+        "--s6": "#db8684",
+        "--s7": "#82c393",
+        "--s8": "#7a8281",
+        "--pos": "#82c393",
+        "--warn": "#e1ac69",
+        "--neg": "#db8684"
+      }
+    },
+    {
+      "name": "dusty-violet",
+      "family": "dusty-violet",
+      "mode": "light",
+      "canonical": true,
+      "label": "灰紫",
+      "description": "降饱和 + 混灰的紫，偏设计感 —— 适合 class/state/ER/concept/mind map",
+      "tokens": {
+        "--ink": "#211e25",
+        "--muted": "#55505b",
+        "--faint": "#7e7984",
+        "--grid": "#e1dee4",
+        "--paper": "#f5f4f7",
+        "--panel": "#fefdfe",
+        "--line": "#c4c1c9",
+        "--accent": "#6a588a",
+        "--accent-ink": "#4f3c6e",
+        "--accent-soft": "#f2ecff",
+        "--edge": "#756e7d",
+        "--group": "#e2dfe5",
+        "--group-line": "#bdb7cb",
+        "--s1": "#6a588a",
+        "--s2": "#358989",
+        "--s3": "#4d3f67",
+        "--s4": "#70b2b2",
+        "--s5": "#b3782e",
+        "--s6": "#a34946",
+        "--s7": "#3c7b50",
+        "--s8": "#96949a",
+        "--pos": "#3c7b50",
+        "--warn": "#b3782e",
+        "--neg": "#a34946"
+      }
+    },
+    {
+      "name": "dusty-violet-dark",
+      "family": "dusty-violet",
+      "mode": "dark",
+      "canonical": true,
+      "label": "灰紫",
+      "description": "降饱和 + 混灰的紫，偏设计感 —— 适合 class/state/ER/concept/mind map",
+      "tokens": {
+        "--ink": "#ebe8ee",
+        "--muted": "#b8b4bd",
+        "--faint": "#827e88",
+        "--grid": "#312f34",
+        "--paper": "#19171c",
+        "--panel": "#2e2b31",
+        "--line": "#48444d",
+        "--accent": "#b4a4d4",
+        "--accent-ink": "#d9cdf4",
+        "--accent-soft": "#3d344d",
+        "--edge": "#8f8998",
+        "--group": "#232026",
+        "--group-line": "#4e485c",
+        "--s1": "#b4a4d4",
+        "--s2": "#6cb7b6",
+        "--s3": "#cebeed",
+        "--s4": "#428e8e",
+        "--s5": "#e1ac69",
+        "--s6": "#db8684",
+        "--s7": "#82c393",
+        "--s8": "#817f85",
+        "--pos": "#82c393",
+        "--warn": "#e1ac69",
+        "--neg": "#db8684"
+      }
+    },
+    {
+      "name": "warm-sand",
+      "family": "warm-sand",
+      "mode": "light",
+      "canonical": true,
+      "label": "暖沙",
+      "description": "暖纸感：沙土主色 + 冷岩（slate）强调",
+      "tokens": {
+        "--ink": "#241e16",
+        "--muted": "#5b5144",
+        "--faint": "#847a6e",
+        "--grid": "#e4dfd8",
+        "--paper": "#f7f4f0",
+        "--panel": "#fefdfc",
+        "--line": "#c9c1b7",
+        "--accent": "#7a5d38",
+        "--accent-ink": "#5d421c",
+        "--accent-soft": "#feecd7",
+        "--edge": "#7c6f5e",
+        "--group": "#e5e0d9",
+        "--group-line": "#c7b8a6",
+        "--s1": "#7a5d38",
+        "--s2": "#597f9f",
+        "--s3": "#5a4325",
+        "--s4": "#88a9c5",
+        "--s5": "#bd7042",
+        "--s6": "#96353e",
+        "--s7": "#3c7b50",
+        "--s8": "#9a948d",
+        "--pos": "#3c7b50",
+        "--warn": "#bd7042",
+        "--neg": "#96353e"
+      }
+    },
+    {
+      "name": "warm-sand-dark",
+      "family": "warm-sand",
+      "mode": "dark",
+      "canonical": true,
+      "label": "暖沙",
+      "description": "暖纸感：沙土主色 + 冷岩（slate）强调",
+      "tokens": {
+        "--ink": "#ede9e2",
+        "--muted": "#bdb4a9",
+        "--faint": "#877f73",
+        "--grid": "#34302a",
+        "--paper": "#1c1812",
+        "--panel": "#312c25",
+        "--line": "#4c453c",
+        "--accent": "#cdaf8a",
+        "--accent-ink": "#edd3b4",
+        "--accent-soft": "#463621",
+        "--edge": "#978a78",
+        "--group": "#26211a",
+        "--group-line": "#584937",
+        "--s1": "#cdaf8a",
+        "--s2": "#80add4",
+        "--s3": "#967347",
+        "--s4": "#5985aa",
+        "--s5": "#eea37a",
+        "--s6": "#da8188",
+        "--s7": "#82c393",
+        "--s8": "#847f78",
+        "--pos": "#82c393",
+        "--warn": "#eea37a",
+        "--neg": "#da8188"
+      }
+    },
+    {
+      "name": "olive-paper",
+      "family": "olive-paper",
+      "mode": "light",
+      "canonical": true,
+      "label": "橄榄纸张",
+      "description": "复古纸张橄榄调 + 墨蓝对比色",
+      "tokens": {
+        "--ink": "#212016",
+        "--muted": "#555344",
+        "--faint": "#7f7c6e",
+        "--grid": "#e1e0d8",
+        "--paper": "#f5f5f0",
+        "--panel": "#fefdfc",
+        "--line": "#c5c3b7",
+        "--accent": "#616434",
+        "--accent-ink": "#494b1a",
+        "--accent-soft": "#eff3d1",
+        "--edge": "#75725e",
+        "--group": "#e2e1d9",
+        "--group-line": "#bbbda7",
+        "--s1": "#616434",
+        "--s2": "#4b81a5",
+        "--s3": "#494b1c",
+        "--s4": "#7dabcb",
+        "--s5": "#b3782e",
+        "--s6": "#a34946",
+        "--s7": "#3c7b50",
+        "--s8": "#97958d",
+        "--pos": "#3c7b50",
+        "--warn": "#b3782e",
+        "--neg": "#a34946"
+      }
+    },
+    {
+      "name": "olive-paper-dark",
+      "family": "olive-paper",
+      "mode": "dark",
+      "canonical": true,
+      "label": "橄榄纸张",
+      "description": "复古纸张橄榄调 + 墨蓝对比色",
+      "tokens": {
+        "--ink": "#ebeae2",
+        "--muted": "#b8b6a9",
+        "--faint": "#838173",
+        "--grid": "#32312a",
+        "--paper": "#191812",
+        "--panel": "#2e2d25",
+        "--line": "#48473c",
+        "--accent": "#b2b686",
+        "--accent-ink": "#d8dcb2",
+        "--accent-soft": "#3a3c21",
+        "--edge": "#908d78",
+        "--group": "#23221a",
+        "--group-line": "#4c4e38",
+        "--s1": "#b2b686",
+        "--s2": "#7caed2",
+        "--s3": "#7b7f49",
+        "--s4": "#5586a9",
+        "--s5": "#e1ac69",
+        "--s6": "#db8684",
+        "--s7": "#82c393",
+        "--s8": "#828078",
+        "--pos": "#82c393",
+        "--warn": "#e1ac69",
+        "--neg": "#db8684"
+      }
+    },
+    {
+      "name": "light",
+      "family": null,
+      "mode": "light",
+      "canonical": false,
+      "note": "the original built-in light palette"
+    },
+    {
+      "name": "dark",
+      "family": null,
+      "mode": "dark",
+      "canonical": false,
+      "note": "the original built-in dark palette"
+    }
+  ]
+}
+exit-code: 0
+

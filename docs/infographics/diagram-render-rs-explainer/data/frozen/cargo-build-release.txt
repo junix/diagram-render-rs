@@ -1,0 +1,102 @@
+# cargo build --offline --release (fresh target dir, full transcript)
+$ cargo build --offline --release
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.47
+   Compiling simd-adler32 v0.3.10
+   Compiling adler2 v2.0.1
+   Compiling crc32fast v1.5.1
+   Compiling memchr v2.8.3
+   Compiling arrayvec v0.7.8
+   Compiling libc v0.2.189
+   Compiling utf8parse v0.2.2
+   Compiling ucd-trie v0.1.7
+   Compiling serde_core v1.0.229
+   Compiling version_check v0.9.5
+   Compiling cfg-if v1.0.4
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling bitflags v2.13.1
+   Compiling float-cmp v0.9.0
+   Compiling once_cell v1.21.4
+   Compiling colorchoice v1.0.5
+   Compiling smallvec v1.15.2
+   Compiling miniz_oxide v0.9.1
+   Compiling anstyle-parse v1.0.0
+   Compiling log v0.4.34
+   Compiling anstyle v1.0.14
+   Compiling anstyle-query v1.1.5
+   Compiling strict-num v0.1.1
+   Compiling clap_lex v1.1.0
+   Compiling tinyvec_macros v0.1.1
+   Compiling heck v0.5.0
+   Compiling polycool v0.4.0
+   Compiling zmij v1.0.23
+   Compiling slotmap v1.1.1
+   Compiling arrayref v0.3.9
+   Compiling serde v1.0.229
+   Compiling anstream v1.0.0
+   Compiling strsim v0.11.1
+   Compiling tinyvec v1.12.0
+   Compiling miniz_oxide v0.8.9
+   Compiling pest v2.9.0
+   Compiling fdeflate v0.3.7
+   Compiling siphasher v1.0.3
+   Compiling serde_json v1.0.151
+   Compiling clap_builder v4.6.6
+   Compiling kurbo v0.13.1
+   Compiling roxmltree v0.21.1
+   Compiling simplecss v0.2.2
+   Compiling unicode-script v0.5.8
+   Compiling quick-error v2.0.1
+   Compiling thiserror v2.0.20
+   Compiling base64 v0.23.1
+   Compiling imagesize v0.15.0
+   Compiling byteorder-lite v0.1.0
+   Compiling unicode-bidi v0.3.18
+   Compiling data-url v0.3.2
+   Compiling itoa v1.0.18
+   Compiling pest_meta v2.9.0
+   Compiling svgtypes v0.16.1
+   Compiling unicode-vo v0.1.0
+   Compiling zune-core v0.5.3
+   Compiling pico-args v0.5.0
+   Compiling xmlwriter v0.1.0
+   Compiling weezl v0.1.12
+   Compiling color_quant v1.1.0
+   Compiling zune-jpeg v0.5.15
+   Compiling image-webp v0.2.4
+   Compiling unicode-width v0.2.2
+   Compiling gif v0.14.2
+   Compiling flate2 v1.1.10
+   Compiling png v0.18.1
+   Compiling syn v3.0.4
+   Compiling syn v2.0.119
+   Compiling memmap2 v0.9.11
+   Compiling pest_generator v2.9.0
+   Compiling fontdb v0.24.0
+   Compiling pest_derive v2.9.0
+   Compiling bytemuck_derive v1.12.0
+   Compiling serde_derive v1.0.229
+   Compiling clap_derive v4.6.4
+   Compiling thiserror-impl v2.0.20
+   Compiling bytemuck v1.25.2
+   Compiling clap v4.6.6
+   Compiling font-types v0.12.4
+   Compiling tiny-skia-path v0.12.0
+   Compiling rgb v0.8.53
+   Compiling read-fonts v0.41.0
+   Compiling tiny-skia v0.12.0
+   Compiling diagram-theme v0.1.0 (https://github.com/junix/diagram-theme-rs.git?rev=1f77cb8f19804ba03668fb3598a550c54c38cb9b#1f77cb8f)
+   Compiling serde_json5 v0.2.1
+   Compiling diagram-ast-parser v0.1.0 (https://github.com/junix/diagram-ast-parser.git?rev=f34a45cb9ea60c08a5aa3190874035a6156fe284#f34a45cb)
+   Compiling harfrust v0.12.0
+   Compiling skrifa v0.44.0
+   Compiling usvg v0.48.1
+   Compiling resvg v0.48.1
+   Compiling diagram-render-rs v0.1.0 (/Users/junix/projects/plot/diagram-render-rs)
+    Finished `release` profile [optimized] target(s) in 41.50s
+
+exit-code: 0
+wall-seconds: 41.5
+binary-sha256: d97647108afce0b5ce82551b0db5fe893bc1131bc58a51aa980237d155dabc6b
+binary-bytes: 4,744,320

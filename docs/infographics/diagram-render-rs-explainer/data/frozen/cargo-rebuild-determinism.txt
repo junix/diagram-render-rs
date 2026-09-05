@@ -1,0 +1,4 @@
+# cargo rebuild determinism: second fresh target dir, binary compared
+pass-A binary sha256: d97647108afce0b5ce82551b0db5fe893bc1131bc58a51aa980237d155dabc6b
+pass-B binary sha256: d97647108afce0b5ce82551b0db5fe893bc1131bc58a51aa980237d155dabc6b
+result: byte-identical binaries

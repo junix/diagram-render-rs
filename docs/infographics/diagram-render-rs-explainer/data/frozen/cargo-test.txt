@@ -1,0 +1,167 @@
+# cargo test --all-targets --all-features --offline (full transcript)
+$ cargo test --all-targets --all-features --offline
+
+running 4 tests
+test renderers::cards::tests::polyline_middle_uses_distance_instead_of_vertex_index ... ok
+test renderers::cards::tests::wide_same_row_labels_route_through_the_row_gap ... ok
+test renderers::wavedrom::tests::negative_clock_continuation_keeps_its_polarity ... ok
+test renderers::wavedrom::tests::edge_parser_separates_node_names_from_the_label ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test checked_in_gallery_artifacts_are_accessible_and_decodable ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.39s
+
+
+running 1 test
+test cli_renders_png_selected_by_output_extension ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.15s
+
+
+running 8 tests
+test unsafe_raster_scale_is_rejected ... ok
+test explicit_background_is_emitted ... ok
+test svg_text_is_xml_escaped ... ok
+test d2_edge_operators_keep_their_arrowhead_cardinality ... ok
+test serialized_ast_round_trip_skips_source_parsing ... ok
+test implemented_feature_surface_retains_value_sensitive_details ... ok
+test requested_png_width_is_exact ... ok
+test every_ast_family_renders_to_accessible_svg_and_transparent_png ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.90s
+
+
+running 12 tests
+test resolve_accepts_the_fourteen_and_this_binarys_two ... ok
+test the_mapping_is_the_one_adr_1137_fixed ... ok
+test the_legacy_names_stay_their_own_palettes_and_the_default_stays_light ... ok
+test the_series_ramp_has_eight_distinct_slots_and_cycles ... ok
+test the_two_occluding_surfaces_are_opaque_in_every_theme ... ok
+test the_declared_unmapped_roles_never_reach_a_drawing_color ... ok
+test themes_prints_the_fourteen_bare_lines_two_justfiles_loop_over ... ok
+test an_unknown_theme_reports_the_shared_error_and_this_binarys_legacy_names ... ok
+test themes_json_publishes_this_renderers_profile_verbatim ... ok
+test the_input_path_still_wins_the_first_positional ... ok
+test each_family_renders_differently_in_its_two_modes ... ok
+test every_theme_renders_a_canvas_that_is_clear_at_twelve_sample_points ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.73s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.24
+   Compiling memchr v2.8.3
+   Compiling simd-adler32 v0.3.10
+   Compiling crc32fast v1.5.1
+   Compiling adler2 v2.0.1
+   Compiling arrayvec v0.7.8
+   Compiling serde_core v1.0.229
+   Compiling ucd-trie v0.1.7
+   Compiling cfg-if v1.0.4
+   Compiling version_check v0.9.5
+   Compiling utf8parse v0.2.2
+   Compiling libc v0.2.189
+   Compiling anstyle v1.0.14
+   Compiling bitflags v2.13.1
+   Compiling smallvec v1.15.2
+   Compiling log v0.4.34
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling colorchoice v1.0.5
+   Compiling miniz_oxide v0.9.1
+   Compiling anstyle-parse v1.0.0
+   Compiling float-cmp v0.9.0
+   Compiling once_cell v1.21.4
+   Compiling anstyle-query v1.1.5
+   Compiling serde v1.0.229
+   Compiling clap_lex v1.1.0
+   Compiling arrayref v0.3.9
+   Compiling strict-num v0.1.1
+   Compiling polycool v0.4.0
+   Compiling anstream v1.0.0
+   Compiling strsim v0.11.1
+   Compiling heck v0.5.0
+   Compiling tinyvec_macros v0.1.1
+   Compiling zmij v1.0.23
+   Compiling miniz_oxide v0.8.9
+   Compiling fdeflate v0.3.7
+   Compiling siphasher v1.0.3
+   Compiling slotmap v1.1.1
+   Compiling serde_json v1.0.151
+   Compiling tinyvec v1.12.0
+   Compiling simplecss v0.2.2
+   Compiling pest v2.9.0
+   Compiling clap_builder v4.6.6
+   Compiling kurbo v0.13.1
+   Compiling roxmltree v0.21.1
+   Compiling imagesize v0.15.0
+   Compiling pico-args v0.5.0
+   Compiling data-url v0.3.2
+   Compiling unicode-vo v0.1.0
+   Compiling byteorder-lite v0.1.0
+   Compiling quick-error v2.0.1
+   Compiling zune-core v0.5.3
+   Compiling color_quant v1.1.0
+   Compiling unicode-script v0.5.8
+   Compiling thiserror v2.0.20
+   Compiling base64 v0.23.1
+   Compiling itoa v1.0.18
+   Compiling xmlwriter v0.1.0
+   Compiling weezl v0.1.12
+   Compiling unicode-bidi v0.3.18
+   Compiling image-webp v0.2.4
+   Compiling zune-jpeg v0.5.15
+   Compiling unicode-width v0.2.2
+   Compiling svgtypes v0.16.1
+   Compiling gif v0.14.2
+   Compiling pest_meta v2.9.0
+   Compiling syn v3.0.4
+   Compiling syn v2.0.119
+   Compiling flate2 v1.1.10
+   Compiling png v0.18.1
+   Compiling pest_generator v2.9.0
+   Compiling pest_derive v2.9.0
+   Compiling bytemuck_derive v1.12.0
+   Compiling clap_derive v4.6.4
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.20
+   Compiling memmap2 v0.9.11
+   Compiling bytemuck v1.25.2
+   Compiling clap v4.6.6
+   Compiling fontdb v0.24.0
+   Compiling font-types v0.12.4
+   Compiling tiny-skia-path v0.12.0
+   Compiling rgb v0.8.53
+   Compiling read-fonts v0.41.0
+   Compiling tiny-skia v0.12.0
+   Compiling diagram-theme v0.1.0 (https://github.com/junix/diagram-theme-rs.git?rev=1f77cb8f19804ba03668fb3598a550c54c38cb9b#1f77cb8f)
+   Compiling serde_json5 v0.2.1
+   Compiling diagram-ast-parser v0.1.0 (https://github.com/junix/diagram-ast-parser.git?rev=f34a45cb9ea60c08a5aa3190874035a6156fe284#f34a45cb)
+   Compiling harfrust v0.12.0
+   Compiling skrifa v0.44.0
+   Compiling usvg v0.48.1
+   Compiling resvg v0.48.1
+   Compiling diagram-render-rs v0.1.0 (/Users/junix/projects/plot/diagram-render-rs)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 17.25s
+     Running unittests src/lib.rs (/tmp/ign-drr/target-frozen/debug/deps/diagram_render_rs-f66cc1719768180b)
+     Running unittests src/main.rs (/tmp/ign-drr/target-frozen/debug/deps/diagram_render_rs-c50f39b48256ff81)
+     Running tests/artifacts.rs (/tmp/ign-drr/target-frozen/debug/deps/artifacts-64a1d779fd018ab2)
+     Running tests/cli.rs (/tmp/ign-drr/target-frozen/debug/deps/cli-426d00f81bd2d60e)
+     Running tests/render.rs (/tmp/ign-drr/target-frozen/debug/deps/render-7bcc1214fbeb143b)
+     Running tests/themes.rs (/tmp/ign-drr/target-frozen/debug/deps/themes-94da9faf39ad3173)
+     Running unittests examples/gallery.rs (/tmp/ign-drr/target-frozen/debug/examples/gallery-96617573a0d0d739)
+
+exit-code: 0

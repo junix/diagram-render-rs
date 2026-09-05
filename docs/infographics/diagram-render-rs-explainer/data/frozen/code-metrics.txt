@@ -1,0 +1,30 @@
+# wc -l over engine Rust sources at the frozen snapshot
+[src]
+    25 src/error.rs
+   143 src/lib.rs
+   201 src/main.rs
+    56 src/raster.rs
+   541 src/renderers/cards.rs
+   155 src/renderers/d2.rs
+   175 src/renderers/dbml.rs
+   112 src/renderers/likec4.rs
+    29 src/renderers/mod.rs
+   101 src/renderers/nomnoml.rs
+   303 src/renderers/pikchr.rs
+   109 src/renderers/structurizr.rs
+   513 src/renderers/wavedrom.rs
+   240 src/scene.rs
+   200 src/svg.rs
+   186 src/theme.rs
+  3089 TOTAL (src)
+[tests]
+    57 tests/artifacts.rs
+    30 tests/cli.rs
+   186 tests/render.rs
+   257 tests/themes.rs
+   530 TOTAL (tests)
+[examples]
+    77 examples/gallery.rs
+    77 TOTAL (examples)
+  3696 TOTAL (src+tests+examples)
+src-rust-file-count: 16

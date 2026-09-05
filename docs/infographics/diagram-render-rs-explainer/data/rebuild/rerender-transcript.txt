@@ -1,0 +1,66 @@
+# Deterministic re-render of the seven fixtures (normalized transcript)
+# tokens: <work> scratch dir, <dur> durations, <ts> timestamps
+$ diagram-render-rs schema.dbml --format dbml -o dbml.svg
+wrote <work>/dbml.svg (692x565 CSS px)
+exit-code: 0
+$ diagram-render-rs schema.dbml --format dbml -o dbml.png
+wrote <work>/dbml.png (1384x1130px)
+exit-code: 0
+facts: svg=6,054B sha=cad1972cff5b0a4a… scene=692x565 png=62,624B 1384x1130 sha=152d0e3be2bb9662…
+
+$ diagram-render-rs timing.json5 --format wavedrom -o wavedrom.svg
+wrote <work>/wavedrom.svg (660x324 CSS px)
+exit-code: 0
+$ diagram-render-rs timing.json5 --format wavedrom -o wavedrom.png
+wrote <work>/wavedrom.png (1320x648px)
+exit-code: 0
+facts: svg=11,628B sha=ce2d272464f81685… scene=660x324 png=26,284B 1320x648 sha=dd5a960a0bd7a79b…
+
+$ diagram-render-rs architecture.d2 --format d2 -o d2.svg
+wrote <work>/d2.svg (692x451 CSS px)
+exit-code: 0
+$ diagram-render-rs architecture.d2 --format d2 -o d2.png
+wrote <work>/d2.png (1384x902px)
+exit-code: 0
+facts: svg=5,348B sha=774692a9448bdb7f… scene=692x451 png=47,284B 1384x902 sha=be6a167f7087cecb…
+
+$ diagram-render-rs workspace.dsl --format structurizr -o structurizr.svg
+warning: Structurizr `views` view syntax is retained, but this renderer shows the model rather than evaluating a view
+wrote <work>/structurizr.svg (692x470 CSS px)
+exit-code: 0
+$ diagram-render-rs workspace.dsl --format structurizr -o structurizr.png
+warning: Structurizr `views` view syntax is retained, but this renderer shows the model rather than evaluating a view
+wrote <work>/structurizr.png (1384x940px)
+exit-code: 0
+facts: svg=6,607B sha=0b23cb17ac0c07be… scene=692x470 png=60,403B 1384x940 sha=4572e874e28f9f8c…
+
+$ diagram-render-rs model.c4 --format likec4 -o likec4.svg
+warning: LikeC4 index view is retained, but this renderer shows the model rather than evaluating predicates/includes
+wrote <work>/likec4.svg (692x432 CSS px)
+exit-code: 0
+$ diagram-render-rs model.c4 --format likec4 -o likec4.png
+warning: LikeC4 index view is retained, but this renderer shows the model rather than evaluating predicates/includes
+wrote <work>/likec4.png (1384x864px)
+exit-code: 0
+facts: svg=5,884B sha=0160766666652605… scene=692x432 png=40,787B 1384x864 sha=8d2817f2ae85de8d…
+
+$ diagram-render-rs classes.nomnoml --format nomnoml -o nomnoml.svg
+wrote <work>/nomnoml.svg (692x451 CSS px)
+exit-code: 0
+$ diagram-render-rs classes.nomnoml --format nomnoml -o nomnoml.png
+wrote <work>/nomnoml.png (1384x902px)
+exit-code: 0
+facts: svg=4,438B sha=837b6c5ddd3ff7ab… scene=692x451 png=40,504B 1384x902 sha=064c0f2c1593f523…
+
+$ diagram-render-rs flow.pikchr --format pikchr -o pikchr.svg
+warning: Pikchr attributes are retained by the AST; this renderer currently applies labels and common flow geometry, not expression-level sizing/placement
+warning: Pikchr assignment `spacing` is retained but not expression-evaluated
+wrote <work>/pikchr.svg (700x300 CSS px)
+exit-code: 0
+$ diagram-render-rs flow.pikchr --format pikchr -o pikchr.png
+warning: Pikchr attributes are retained by the AST; this renderer currently applies labels and common flow geometry, not expression-level sizing/placement
+warning: Pikchr assignment `spacing` is retained but not expression-evaluated
+wrote <work>/pikchr.png (1400x600px)
+exit-code: 0
+facts: svg=2,876B sha=e3ef1fb335304992… scene=700x300 png=23,270B 1400x600 sha=f90e5bd9fc084660…
+

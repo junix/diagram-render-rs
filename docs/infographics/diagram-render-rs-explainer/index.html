@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta content="width=1200" name="viewport">
+<title>可审计技术长图 · diagram-render-rs</title>
+<style>:root {
+    --ink: #101826;
+    --ink2: #3f4b63;
+    --muted: #6b7690;
+    --line: #dfe6f1;
+    --card: #ffffff;
+    --page: #f2f6fc;
+    --blue: #2a78d6;
+    --deep: #1c5cab;
+    --navy: #123c74;
+    --soft: #eaf2fc
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box
+}
+html {
+    background: var(--page)
+}
+body {
+    width: 1200px;
+    margin: 0 auto;
+    font-family: system-ui,-apple-system,'PingFang SC', 'Segoe UI',sans-serif;
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased
+}
+section,header.hero,footer {
+    margin: 0 0 22px
+}
+h2 {
+    font-size: 19px;
+    color: var(--navy);
+    margin: 0 0 6px
+}
+h2 .no {
+    color: var(--blue);
+    font-weight: 700;
+    margin-right: 8px
+}
+.sub {
+    color: var(--muted);
+    font-size: 12.5px;
+    margin: 0 0 14px
+}
+.card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 22px 24px
+}
+.hero {
+    background: linear-gradient(135deg,var(--navy) 0%,var(--deep) 100%);
+    color: #fff;
+    border-radius: 12px;
+    padding: 34px 36px 28px
+}
+.hero .eyebrow {
+    font-size: 12px;
+    letter-spacing: .12em;
+    opacity: .82;
+    margin-bottom: 10px
+}
+.hero h1 {
+    font-size: 34px;
+    letter-spacing: .01em;
+    margin-bottom: 8px
+}
+.hero p.lead {
+    font-size: 15px;
+    opacity: .94;
+    max-width: 900px
+}
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px
+}
+.chip {
+    font-size: 11.5px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.35);
+    color: #fff
+}
+.tiles {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 14px
+}
+.tile {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 18px 13px
+}
+.tile .v {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--deep)
+}
+.tile .v small {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--blue);
+    margin-left: 2px
+}
+.tile .k {
+    font-size: 12px;
+    color: var(--ink2);
+    margin-top: 2px
+}
+.tile .d {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.5
+}
+.threecol {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 12px;
+    margin-top: 12px
+}
+.threecol .card {
+    padding: 16px 18px
+}
+.threecol h3 {
+    font-size: 13.5px;
+    color: var(--navy);
+    margin-bottom: 6px
+}
+.threecol p {
+    font-size: 12.5px;
+    color: var(--ink2)
+}
+code,.mono {
+    font-family: ui-monospace,'SF Mono',Menlo,monospace
+}
+pre.term {
+    background: #0e1b30;
+    color: #d7e4f7;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: ui-monospace,'SF Mono',Menlo,monospace;
+    font-size: 11.5px;
+    line-height: 1.75;
+    overflow: hidden
+}
+pre.term .c {
+    color: #8fb7ea
+}
+.panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 0 4px;
+    margin-bottom: 14px
+}
+.panel svg {
+    display: block;
+    margin: 0 auto
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    background: var(--card)
+}
+th {
+    font-size: 11.5px;
+    color: var(--muted);
+    font-weight: 600;
+    text-align: right;
+    padding: 8px 10px;
+    border-bottom: 1.5px solid var(--line);
+    white-space: nowrap
+}
+th:first-child,td:first-child {
+    text-align: left
+}
+td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--line);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink2);
+    white-space: nowrap
+}
+td.name {
+    color: var(--ink);
+    font-weight: 600
+}
+tr.total td {
+    border-top: 2px solid var(--line);
+    border-bottom: none;
+    color: var(--ink);
+    font-weight: 700
+}
+.theme-grid {
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    gap: 8px
+}
+.tchip {
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 7px 6px;
+    text-align: center;
+    background: var(--card)
+}
+.tchip .n {
+    font-size: 11px;
+    color: var(--ink);
+    font-weight: 600;
+    word-break: break-all
+}
+.tchip .z {
+    font-size: 10.5px;
+    color: var(--muted);
+    margin-top: 1px
+}
+.guards {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 12px
+}
+.guard {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    padding: 14px 15px 11px
+}
+.guard .t {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px
+}
+.guard .b {
+    font-size: 11.5px;
+    color: var(--ink2);
+    line-height: 1.55
+}
+.guard .b b {
+    color: var(--ink)
+}
+.batteries {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 10px;
+    margin-top: 12px
+}
+.battery {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: #f4f9f4;
+    border: 1px solid #cfe3cf;
+    border-radius: 10px;
+    padding: 10px 14px
+}
+.battery .ok {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #0ca30c;
+    color: #fff;
+    font-size: 12px;
+    text-align: center;
+    line-height: 20px;
+    flex: none;
+    font-weight: 700
+}
+.battery .t {
+    font-size: 12.5px;
+    color: var(--ink)
+}
+.battery .d {
+    font-size: 11px;
+    color: var(--muted)
+}
+.evlist {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 26px
+}
+.evitem {
+    display: flex;
+    gap: 10px;
+    padding: 6.5px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 12px
+}
+.evitem .f {
+    font-family: ui-monospace,'SF Mono',Menlo,monospace;
+    color: var(--deep);
+    white-space: nowrap;
+    font-size: 11px
+}
+.evitem .w {
+    color: var(--muted)
+}
+footer {
+    background: var(--navy);
+    color: #c9d9f0;
+    border-radius: 12px;
+    padding: 18px 26px;
+    font-size: 11.5px;
+    line-height: 1.7
+}
+footer b {
+    color: #fff
+}
+.note {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 10px
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">可审计技术长图 · 引擎快照 b38ba07 · 2026-09-05 冻结实测</div>
+  <h1>diagram-render-rs</h1>
+  <p class="lead">纯 Rust 图表渲染引擎：把兄弟项目产出的七种类型化 AST（DBML · WaveDrom · D2 · Structurizr · LikeC4 · nomnoml · Pikchr）渲染为 SVG 与 PNG。本页每个数字都来自一次性冻结的真实实测，可逐项回溯。</p>
+  <div class="chips">
+    <div class="chip">快照 b38ba079257a5306…</div>
+    <div class="chip">rustc 1.98.0 · 离线构建 · 零网络</div>
+    <div class="chip">依赖 7 项 · 2 项按 git 修订锁定</div>
+    <div class="chip">本页零 JS · 零外链 · 自包含</div>
+  </div>
+</header>
+
+<section class="tiles">
+  <div class="tile"><div class="v">7<small>种</small></div><div class="k">DSL 家族全覆盖</div>
+    <div class="d">同一 CLI、同一条渲染管线，七种图表语言</div></div>
+  <div class="tile"><div class="v">6<small>类</small></div><div class="k">场景绘图原语</div>
+    <div class="d">矩形 椭圆 直线 折线 多边形 文本 —— 视觉边界，不是图模型</div></div>
+  <div class="tile"><div class="v">14<small>+2</small></div><div class="k">主题（共享注册 + 遗留）</div>
+    <div class="d">五个渲染器拼法一致，默认 light</div></div>
+  <div class="tile"><div class="v">26<small>项</small></div><div class="k">Rust 测试全部通过</div>
+    <div class="d">快照实测全量转录，含七格式与可访问性断言</div></div>
+</section>
+
+<section id="pipeline">
+  <div class="card">
+    <h2><span class="no">01</span>从类型化 AST 到像素</h2>
+    <p class="sub">解析与渲染分仓：解析归兄弟项目，渲染归本引擎，场景原语层是两者之间唯一的交界。</p>
+    <div class="panel"><svg xmlns="http://www.w3.org/2000/svg" width="1120" height="236" viewBox="0 0 1120 236" aria-labelledby="pt" role="img"><title id="pt">渲染管线：从源文本到 SVG 与 PNG</title><g font-family="system-ui, -apple-system, 'PingFang SC', sans-serif"><text x="16.0" y="26.0" font-size="15" fill="#101826" text-anchor="start" font-weight="600">渲染管线：解析在左、渲染在右，场景原语是两者的边界</text><text x="16.0" y="46.0" font-size="11.5" fill="#6b7690" text-anchor="start" font-weight="normal">数据库模式 · 时序波形 · 架构模型 · 分类图 · 几何场景，七种语言在此汇入同一条降维路径</text><rect x="16.0" y="86" width="168" height="62" rx="8" fill="#ffffff" stroke="#c9d6ea" stroke-width="1.2"/><text x="100.0" y="113.0" font-size="13" fill="#101826" text-anchor="middle" font-weight="600">源文本</text><text x="100.0" y="133.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">七种 DSL 之一</text><line x1="186.0" y1="117.0" x2="196.0" y2="117.0" stroke="#8fa3c4" stroke-width="1.6"/><polygon points="196.0,113.0 196.0,121.0 202.0,117.0" fill="#8fa3c4"/><rect x="200.0" y="86" width="168" height="62" rx="8" fill="#ffffff" stroke="#2a78d6" stroke-width="1.2"/><text x="284.0" y="113.0" font-size="13" fill="#101826" text-anchor="middle" font-weight="600">类型化 AST 文档</text><text x="284.0" y="133.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">兄弟项目 · 修订锁定</text><line x1="370.0" y1="117.0" x2="380.0" y2="117.0" stroke="#8fa3c4" stroke-width="1.6"/><polygon points="380.0,113.0 380.0,121.0 386.0,117.0" fill="#8fa3c4"/><rect x="384.0" y="86" width="168" height="62" rx="8" fill="#ffffff" stroke="#c9d6ea" stroke-width="1.2"/><text x="468.0" y="113.0" font-size="13" fill="#101826" text-anchor="middle" font-weight="600">语言布局解释器</text><text x="468.0" y="133.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">名字·层级·关系</text><line x1="554.0" y1="117.0" x2="564.0" y2="117.0" stroke="#8fa3c4" stroke-width="1.6"/><polygon points="564.0,113.0 564.0,121.0 570.0,117.0" fill="#8fa3c4"/><rect x="568.0" y="86" width="168" height="62" rx="8" fill="#eaf2fc" stroke="#2a78d6" stroke-width="1.2"/><text x="652.0" y="113.0" font-size="13" fill="#101826" text-anchor="middle" font-weight="600">场景原语层</text><text x="652.0" y="133.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">六类绘图原语</text><line x1="738.0" y1="117.0" x2="748.0" y2="117.0" stroke="#8fa3c4" stroke-width="1.6"/><polygon points="748.0,113.0 748.0,121.0 754.0,117.0" fill="#8fa3c4"/><rect x="752.0" y="86" width="168" height="62" rx="8" fill="#ffffff" stroke="#c9d6ea" stroke-width="1.2"/><text x="836.0" y="113.0" font-size="13" fill="#101826" text-anchor="middle" font-weight="600">SVG</text><text x="836.0" y="133.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">引擎自行发射</text><line x1="922.0" y1="117.0" x2="932.0" y2="117.0" stroke="#8fa3c4" stroke-width="1.6"/><polygon points="932.0,113.0 932.0,121.0 938.0,117.0" fill="#8fa3c4"/><rect x="936.0" y="86" width="168" height="62" rx="8" fill="#ffffff" stroke="#c9d6ea" stroke-width="1.2"/><text x="1020.0" y="113.0" font-size="13" fill="#101826" text-anchor="middle" font-weight="600">PNG</text><text x="1020.0" y="133.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">resvg 光栅化</text><text x="560.0" y="182.0" font-size="11.5" fill="#3f4b63" text-anchor="middle" font-weight="600">DBML · WaveDrom · D2 · Structurizr · LikeC4 · nomnoml · Pikchr</text><text x="560.0" y="202.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">解析归兄弟项目（修订 f34a45c 精确锁定）；渲染归本引擎 —— 消费已解析的类型化文档，不再二次解析</text></g></svg></div>
+    <div class="threecol">
+      <div class="card">
+        <h3>场景原语是视觉边界</h3>
+        <p>七种语言各自解释名字、层级与关系，之后只降维为六类绘图原语。数据库模式、时序波形、架构模型、分类图与几何场景本就不是同一类领域对象，所以这里没有「通用图模型」。</p>
+      </div>
+      <div class="card">
+        <h3>出双格式</h3>
+        <p>SVG 由引擎自行发射，PNG 经开源 Rust 光栅化库 resvg 从同一份场景转换而来 —— 一次布局，两种产物。</p>
+      </div>
+      <div class="card">
+        <h3>依赖锁定</h3>
+        <p>全部 7 项依赖均为 Rust 生态库；跨仓依赖 diagram-ast-parser（f34a45c…） · diagram-theme（1f77cb8…） 按修订精确锁定，仓独立可复现。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="measured">
+  <div class="card">
+    <h2><span class="no">02</span>七种 DSL 实测：同一份样例输入，两种产物</h2>
+    <p class="sub">以下全部数字来自冻结的真实 CLI 渲染（发布版二进制，默认缩放 2），产物哈希与元素计数一并冻结。</p>
+    <div class="panel"><svg xmlns="http://www.w3.org/2000/svg" width="1120" height="366" viewBox="0 0 1120 366" aria-labelledby="pt" role="img"><title id="pt">七种 DSL 实测：SVG 与 PNG 产物体积</title><g font-family="system-ui, -apple-system, 'PingFang SC', sans-serif"><text x="16.0" y="26.0" font-size="15" fill="#101826" text-anchor="start" font-weight="600">同一份样例输入、两种产物：SVG 与 PNG 实测体积</text><rect x="830.0" y="18.0" width="11" height="11" rx="2" fill="#2a78d6"/><text x="846.0" y="26.0" font-size="11.5" fill="#3f4b63" text-anchor="start" font-weight="normal">SVG</text><rect x="885.4" y="18.0" width="11" height="11" rx="2" fill="#eb6834"/><text x="901.4" y="26.0" font-size="11.5" fill="#3f4b63" text-anchor="start" font-weight="normal">PNG</text><line x1="150.0" y1="322.0" x2="975.0" y2="322.0" stroke="#c3ccd9" stroke-width="1"/><line x1="150.0" y1="44.0" x2="150.0" y2="322.0" stroke="#e7ecf5" stroke-width="1"/><text x="150.0" y="338.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">0</text><line x1="385.7" y1="44.0" x2="385.7" y2="322.0" stroke="#e7ecf5" stroke-width="1"/><text x="385.7" y="338.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">20 KB</text><line x1="621.4" y1="44.0" x2="621.4" y2="322.0" stroke="#e7ecf5" stroke-width="1"/><text x="621.4" y="338.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">40 KB</text><line x1="857.1" y1="44.0" x2="857.1" y2="322.0" stroke="#e7ecf5" stroke-width="1"/><text x="857.1" y="338.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">60 KB</text><text x="132.0" y="64.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">DBML</text><path d="M150.0,52.0 h67.4 a4,4 0 0 1 4,4 v5.0 a4,4 0 0 1 -4,4 h-67.4 z" fill="#2a78d6"/><text x="229.4" y="62.5" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">6,054 B</text><path d="M150.0,68.0 h734.1 a4,4 0 0 1 4,4 v5.0 a4,4 0 0 1 -4,4 h-734.1 z" fill="#eb6834"/><text x="896.1" y="78.5" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">62,624 B</text><text x="132.0" y="102.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">WaveDrom</text><path d="M150.0,90.0 h133.0 a4,4 0 0 1 4,4 v5.0 a4,4 0 0 1 -4,4 h-133.0 z" fill="#2a78d6"/><text x="295.0" y="100.5" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">11,628 B</text><path d="M150.0,106.0 h305.8 a4,4 0 0 1 4,4 v5.0 a4,4 0 0 1 -4,4 h-305.8 z" fill="#eb6834"/><text x="467.8" y="116.5" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">26,284 B</text><text x="132.0" y="140.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">D2</text><path d="M150.0,128.0 h59.0 a4,4 0 0 1 4,4 v5.0 a4,4 0 0 1 -4,4 h-59.0 z" fill="#2a78d6"/><text x="221.0" y="138.5" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">5,348 B</text><path d="M150.0,144.0 h553.3 a4,4 0 0 1 4,4 v5.0 a4,4 0 0 1 -4,4 h-553.3 z" fill="#eb6834"/><text x="715.3" y="154.5" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">47,284 B</text><text x="132.0" y="178.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">Structurizr</text><path d="M150.0,166.0 h73.9 a4,4 0 0 1 4,4 v5.0 a4,4 0 0 1 -4,4 h-73.9 z" fill="#2a78d6"/><text x="235.9" y="176.5" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">6,607 B</text><path d="M150.0,182.0 h707.9 a4,4 0 0 1 4,4 v5.0 a4,4 0 0 1 -4,4 h-707.9 z" fill="#eb6834"/><text x="869.9" y="192.5" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">60,403 B</text><text x="132.0" y="216.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">LikeC4</text><path d="M150.0,204.0 h65.3 a4,4 0 0 1 4,4 v5.0 a4,4 0 0 1 -4,4 h-65.3 z" fill="#2a78d6"/><text x="227.3" y="214.5" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">5,884 B</text><path d="M150.0,220.0 h476.7 a4,4 0 0 1 4,4 v5.0 a4,4 0 0 1 -4,4 h-476.7 z" fill="#eb6834"/><text x="638.7" y="230.5" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">40,787 B</text><text x="132.0" y="254.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">nomnoml</text><path d="M150.0,242.0 h48.3 a4,4 0 0 1 4,4 v5.0 a4,4 0 0 1 -4,4 h-48.3 z" fill="#2a78d6"/><text x="210.3" y="252.5" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">4,438 B</text><path d="M150.0,258.0 h473.4 a4,4 0 0 1 4,4 v5.0 a4,4 0 0 1 -4,4 h-473.4 z" fill="#eb6834"/><text x="635.4" y="268.5" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">40,504 B</text><text x="132.0" y="292.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">Pikchr</text><path d="M150.0,280.0 h29.9 a4,4 0 0 1 4,4 v5.0 a4,4 0 0 1 -4,4 h-29.9 z" fill="#2a78d6"/><text x="191.9" y="290.5" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">2,876 B</text><path d="M150.0,296.0 h270.3 a4,4 0 0 1 4,4 v5.0 a4,4 0 0 1 -4,4 h-270.3 z" fill="#eb6834"/><text x="432.3" y="306.5" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">23,270 B</text><text x="16.0" y="358.0" font-size="10.5" fill="#6b7690" text-anchor="start" font-weight="normal">PNG 体积普遍大于 SVG；两者均随图元密度增长 —— 逐行数值见下表</text></g></svg></div>
+    <div class="panel"><svg xmlns="http://www.w3.org/2000/svg" width="1120" height="344" viewBox="0 0 1120 344" aria-labelledby="pt" role="img"><title id="pt">场景原语构成：每种 DSL 的绘图原语计数</title><g font-family="system-ui, -apple-system, 'PingFang SC', sans-serif"><text x="16.0" y="26.0" font-size="15" fill="#101826" text-anchor="start" font-weight="600">降维之后：每份产物由哪些绘图原语构成</text><rect x="790.0" y="18.0" width="11" height="11" rx="2" fill="#2a78d6"/><text x="806.0" y="26.0" font-size="11.5" fill="#3f4b63" text-anchor="start" font-weight="normal">矩形</text><rect x="847.0" y="18.0" width="11" height="11" rx="2" fill="#eb6834"/><text x="863.0" y="26.0" font-size="11.5" fill="#3f4b63" text-anchor="start" font-weight="normal">文本</text><rect x="904.0" y="18.0" width="11" height="11" rx="2" fill="#1baf7a"/><text x="920.0" y="26.0" font-size="11.5" fill="#3f4b63" text-anchor="start" font-weight="normal">线与曲线</text><line x1="150.0" y1="296.0" x2="975.0" y2="296.0" stroke="#c3ccd9" stroke-width="1"/><line x1="150.0" y1="44.0" x2="150.0" y2="296.0" stroke="#e7ecf5" stroke-width="1"/><text x="150.0" y="312.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">0</text><line x1="385.7" y1="44.0" x2="385.7" y2="296.0" stroke="#e7ecf5" stroke-width="1"/><text x="385.7" y="312.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">20</text><line x1="621.4" y1="44.0" x2="621.4" y2="296.0" stroke="#e7ecf5" stroke-width="1"/><text x="621.4" y="312.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">40</text><line x1="857.1" y1="44.0" x2="857.1" y2="296.0" stroke="#e7ecf5" stroke-width="1"/><text x="857.1" y="312.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">60</text><text x="995.0" y="312.0" font-size="10.5" fill="#6b7690" text-anchor="start" font-weight="normal">原语个数</text><text x="132.0" y="68.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">DBML</text><rect x="150.0" y="52.0" width="153.2" height="22" fill="#2a78d6"/><text x="226.6" y="67.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">13</text><rect x="305.2" y="52.0" width="247.5" height="22" fill="#eb6834"/><text x="429.0" y="67.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">21</text><path d="M554.7,52.0 h19.6 a4,4 0 0 1 4,4 v14.0 a4,4 0 0 1 -4,4 h-19.6 z" fill="#1baf7a"/><text x="588.3" y="67.0" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">36</text><text x="132.0" y="104.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">WaveDrom</text><rect x="150.0" y="88.0" width="58.9" height="22" fill="#2a78d6"/><text x="179.5" y="103.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">5</text><rect x="210.9" y="88.0" width="235.7" height="22" fill="#eb6834"/><text x="328.8" y="103.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">20</text><path d="M448.6,88.0 h455.6 a4,4 0 0 1 4,4 v14.0 a4,4 0 0 1 -4,4 h-455.6 z" fill="#1baf7a"/><text x="678.5" y="103.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">39</text><text x="918.3" y="103.0" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">64</text><text x="132.0" y="140.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">D2</text><rect x="150.0" y="124.0" width="165.0" height="22" fill="#2a78d6"/><text x="232.5" y="139.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">14</text><rect x="317.0" y="124.0" width="165.0" height="22" fill="#eb6834"/><text x="399.5" y="139.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">14</text><path d="M484.0,124.0 h43.1 a4,4 0 0 1 4,4 v14.0 a4,4 0 0 1 -4,4 h-43.1 z" fill="#1baf7a"/><text x="507.6" y="139.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">4</text><text x="541.1" y="139.0" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">32</text><text x="132.0" y="176.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">Structurizr</text><rect x="150.0" y="160.0" width="212.1" height="22" fill="#2a78d6"/><text x="256.1" y="175.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">18</text><rect x="364.1" y="160.0" width="212.1" height="22" fill="#eb6834"/><text x="470.2" y="175.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">18</text><path d="M578.3,160.0 h43.1 a4,4 0 0 1 4,4 v14.0 a4,4 0 0 1 -4,4 h-43.1 z" fill="#1baf7a"/><text x="601.9" y="175.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">4</text><text x="635.4" y="175.0" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">40</text><text x="132.0" y="212.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">LikeC4</text><rect x="150.0" y="196.0" width="212.1" height="22" fill="#2a78d6"/><text x="256.1" y="211.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">18</text><rect x="364.1" y="196.0" width="165.0" height="22" fill="#eb6834"/><text x="446.6" y="211.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">14</text><path d="M531.1,196.0 h43.1 a4,4 0 0 1 4,4 v14.0 a4,4 0 0 1 -4,4 h-43.1 z" fill="#1baf7a"/><text x="554.7" y="211.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">4</text><text x="588.3" y="211.0" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">36</text><text x="132.0" y="248.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">nomnoml</text><rect x="150.0" y="232.0" width="141.4" height="22" fill="#2a78d6"/><text x="220.7" y="247.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">12</text><rect x="293.4" y="232.0" width="129.6" height="22" fill="#eb6834"/><text x="358.2" y="247.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">11</text><path d="M425.1,232.0 h43.1 a4,4 0 0 1 4,4 v14.0 a4,4 0 0 1 -4,4 h-43.1 z" fill="#1baf7a"/><text x="448.6" y="247.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">4</text><text x="482.2" y="247.0" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">27</text><text x="132.0" y="284.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">Pikchr</text><rect x="150.0" y="268.0" width="35.4" height="22" fill="#2a78d6"/><text x="167.7" y="283.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">3</text><rect x="187.4" y="268.0" width="82.5" height="22" fill="#eb6834"/><text x="228.6" y="283.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">7</text><path d="M271.9,268.0 h54.9 a4,4 0 0 1 4,4 v14.0 a4,4 0 0 1 -4,4 h-54.9 z" fill="#1baf7a"/><text x="301.3" y="283.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">5</text><text x="340.8" y="283.0" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">15</text><text x="16.0" y="334.0" font-size="10.5" fill="#6b7690" text-anchor="start" font-weight="normal">七份产物合计覆盖全部六类原语（矩形 椭圆 直线 折线 多边形 文本）；WaveDrom 的线与曲线最多（时序波形）</text></g></svg></div>
+    <table><tr><th>DSL</th><th>样例输入</th><th>场景（CSS px）</th><th>SVG（B）</th><th>PNG（像素）</th><th>PNG（B）</th><th>原语合计</th><th>SVG sha256 前 12 位</th></tr><tr><td class="name">DBML</td><td class="mono">schema.dbml</td><td>692 × 565</td><td>6,054</td><td>1384 × 1130</td><td>62,624</td><td>36</td><td class="mono">cad1972cff5b</td></tr><tr><td class="name">WaveDrom</td><td class="mono">timing.json5</td><td>660 × 324</td><td>11,628</td><td>1320 × 648</td><td>26,284</td><td>64</td><td class="mono">ce2d272464f8</td></tr><tr><td class="name">D2</td><td class="mono">architecture.d2</td><td>692 × 451</td><td>5,348</td><td>1384 × 902</td><td>47,284</td><td>32</td><td class="mono">774692a9448b</td></tr><tr><td class="name">Structurizr</td><td class="mono">workspace.dsl</td><td>692 × 470</td><td>6,607</td><td>1384 × 940</td><td>60,403</td><td>40</td><td class="mono">0b23cb17ac0c</td></tr><tr><td class="name">LikeC4</td><td class="mono">model.c4</td><td>692 × 432</td><td>5,884</td><td>1384 × 864</td><td>40,787</td><td>36</td><td class="mono">016076666665</td></tr><tr><td class="name">nomnoml</td><td class="mono">classes.nomnoml</td><td>692 × 451</td><td>4,438</td><td>1384 × 902</td><td>40,504</td><td>27</td><td class="mono">837b6c5ddd3f</td></tr><tr><td class="name">Pikchr</td><td class="mono">flow.pikchr</td><td>700 × 300</td><td>2,876</td><td>1400 × 600</td><td>23,270</td><td>15</td><td class="mono">e3ef1fb33530</td></tr></table>
+    <p class="note">PNG 像素尺寸 = 场景 CSS 尺寸 × 2（CLI 默认缩放），逐行可验；sha256 为对应 SVG 产物的完整哈希前 12 位，全量哈希见冻结证据。</p>
+  </div>
+</section>
+
+<section id="themes">
+  <div class="card">
+    <h2><span class="no">03</span>主题系统：14 个共享名 + 2 个遗留名</h2>
+    <p class="sub">主题注册表由兄弟项目共享，五个图表渲染器拼法完全一致；每个主题都有浅色与深色两档。</p>
+    <div class="theme-grid"><div class="tchip"><div class="n">azure</div><div class="z">蔚蓝</div></div><div class="tchip"><div class="n">azure-dark</div><div class="z">蔚蓝</div></div><div class="tchip"><div class="n">mist-blue</div><div class="z">雾蓝灰</div></div><div class="tchip"><div class="n">mist-blue-dark</div><div class="z">雾蓝灰</div></div><div class="tchip"><div class="n">sage</div><div class="z">鼠尾草</div></div><div class="tchip"><div class="n">sage-dark</div><div class="z">鼠尾草</div></div><div class="tchip"><div class="n">stone-teal</div><div class="z">青灰石</div></div><div class="tchip"><div class="n">stone-teal-dark</div><div class="z">青灰石</div></div><div class="tchip"><div class="n">dusty-violet</div><div class="z">灰紫</div></div><div class="tchip"><div class="n">dusty-violet-dark</div><div class="z">灰紫</div></div><div class="tchip"><div class="n">warm-sand</div><div class="z">暖沙</div></div><div class="tchip"><div class="n">warm-sand-dark</div><div class="z">暖沙</div></div><div class="tchip"><div class="n">olive-paper</div><div class="z">橄榄纸张</div></div><div class="tchip"><div class="n">olive-paper-dark</div><div class="z">橄榄纸张</div></div></div>
+    <p class="note">另有 light / dark 两个遗留名：从不被列出、不并入任何主题族，默认值仍是 light。<b>主题永不涂画布</b> —— 画布默认透明，只有 --background 才填充；选深色档是「宿主页为深色」的断言，文件本身不自适应。</p>
+  </div>
+</section>
+
+<section id="coverage">
+  <div class="card">
+    <h2><span class="no">04</span>特性覆盖：68 项对齐 / 45 项声明排除</h2>
+    <p class="sub">与原版兼容 CLI 逐特性对照（共 113 项）：对齐项由端到端用例锁定，排除项逐条写明理由。</p>
+    <div class="panel"><svg xmlns="http://www.w3.org/2000/svg" width="1120" height="356" viewBox="0 0 1120 356" aria-labelledby="pt" role="img"><title id="pt">特性覆盖矩阵：对齐与声明排除，按语言</title><g font-family="system-ui, -apple-system, 'PingFang SC', sans-serif"><text x="16.0" y="26.0" font-size="15" fill="#101826" text-anchor="start" font-weight="600">与原版兼容 CLI 的特性对齐：68 项对齐 / 45 项声明排除</text><rect x="840.0" y="18.0" width="11" height="11" rx="2" fill="#2a78d6"/><text x="856.0" y="26.0" font-size="11.5" fill="#3f4b63" text-anchor="start" font-weight="normal">对齐特性</text><rect x="920.0" y="18.0" width="11" height="11" rx="2" fill="#b9c2cf"/><text x="936.0" y="26.0" font-size="11.5" fill="#3f4b63" text-anchor="start" font-weight="normal">声明排除</text><line x1="150.0" y1="300.0" x2="975.0" y2="300.0" stroke="#c3ccd9" stroke-width="1"/><line x1="150.0" y1="44.0" x2="150.0" y2="300.0" stroke="#e7ecf5" stroke-width="1"/><text x="150.0" y="316.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">0</text><line x1="287.5" y1="44.0" x2="287.5" y2="300.0" stroke="#e7ecf5" stroke-width="1"/><text x="287.5" y="316.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">4</text><line x1="425.0" y1="44.0" x2="425.0" y2="300.0" stroke="#e7ecf5" stroke-width="1"/><text x="425.0" y="316.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">8</text><line x1="562.5" y1="44.0" x2="562.5" y2="300.0" stroke="#e7ecf5" stroke-width="1"/><text x="562.5" y="316.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">12</text><line x1="700.0" y1="44.0" x2="700.0" y2="300.0" stroke="#e7ecf5" stroke-width="1"/><text x="700.0" y="316.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">16</text><line x1="837.5" y1="44.0" x2="837.5" y2="300.0" stroke="#e7ecf5" stroke-width="1"/><text x="837.5" y="316.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">20</text><line x1="975.0" y1="44.0" x2="975.0" y2="300.0" stroke="#e7ecf5" stroke-width="1"/><text x="975.0" y="316.0" font-size="10.5" fill="#6b7690" text-anchor="middle" font-weight="normal">24</text><text x="995.0" y="316.0" font-size="10.5" fill="#6b7690" text-anchor="start" font-weight="normal">特性项数</text><text x="132.0" y="68.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">DBML</text><rect x="150.0" y="52.0" width="240.6" height="22" fill="#2a78d6"/><text x="270.3" y="67.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">7</text><path d="M392.6,52.0 h511.6 a4,4 0 0 1 4,4 v14.0 a4,4 0 0 1 -4,4 h-511.6 z" fill="#b9c2cf"/><text x="650.4" y="67.0" font-size="10.5" fill="#101826" text-anchor="middle" font-weight="normal">15</text><text x="916.2" y="67.0" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">22</text><text x="132.0" y="104.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">WaveDrom</text><rect x="150.0" y="88.0" width="481.3" height="22" fill="#2a78d6"/><text x="390.6" y="103.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">14</text><path d="M633.2,88.0 h167.9 a4,4 0 0 1 4,4 v14.0 a4,4 0 0 1 -4,4 h-167.9 z" fill="#b9c2cf"/><text x="719.2" y="103.0" font-size="10.5" fill="#101826" text-anchor="middle" font-weight="normal">5</text><text x="813.1" y="103.0" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">19</text><text x="132.0" y="140.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">D2</text><rect x="150.0" y="124.0" width="412.5" height="22" fill="#2a78d6"/><text x="356.2" y="139.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">12</text><path d="M564.5,124.0 h133.5 a4,4 0 0 1 4,4 v14.0 a4,4 0 0 1 -4,4 h-133.5 z" fill="#b9c2cf"/><text x="633.2" y="139.0" font-size="10.5" fill="#101826" text-anchor="middle" font-weight="normal">4</text><text x="710.0" y="139.0" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">16</text><text x="132.0" y="176.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">Structurizr</text><rect x="150.0" y="160.0" width="240.6" height="22" fill="#2a78d6"/><text x="270.3" y="175.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">7</text><path d="M392.6,160.0 h202.2 a4,4 0 0 1 4,4 v14.0 a4,4 0 0 1 -4,4 h-202.2 z" fill="#b9c2cf"/><text x="495.8" y="175.0" font-size="10.5" fill="#101826" text-anchor="middle" font-weight="normal">6</text><text x="606.9" y="175.0" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">13</text><text x="132.0" y="212.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">LikeC4</text><rect x="150.0" y="196.0" width="206.2" height="22" fill="#2a78d6"/><text x="253.1" y="211.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">6</text><path d="M358.2,196.0 h271.0 a4,4 0 0 1 4,4 v14.0 a4,4 0 0 1 -4,4 h-271.0 z" fill="#b9c2cf"/><text x="495.8" y="211.0" font-size="10.5" fill="#101826" text-anchor="middle" font-weight="normal">8</text><text x="641.2" y="211.0" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">14</text><text x="132.0" y="248.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">nomnoml</text><rect x="150.0" y="232.0" width="309.4" height="22" fill="#2a78d6"/><text x="304.7" y="247.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">9</text><path d="M461.4,232.0 h99.1 a4,4 0 0 1 4,4 v14.0 a4,4 0 0 1 -4,4 h-99.1 z" fill="#b9c2cf"/><text x="512.9" y="247.0" font-size="10.5" fill="#101826" text-anchor="middle" font-weight="normal">3</text><text x="572.5" y="247.0" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">12</text><text x="132.0" y="284.0" font-size="12.5" fill="#101826" text-anchor="end" font-weight="normal">Pikchr</text><rect x="150.0" y="268.0" width="446.9" height="22" fill="#2a78d6"/><text x="373.4" y="283.0" font-size="10.5" fill="#ffffff" text-anchor="middle" font-weight="normal">13</text><path d="M598.9,268.0 h133.5 a4,4 0 0 1 4,4 v14.0 a4,4 0 0 1 -4,4 h-133.5 z" fill="#b9c2cf"/><text x="667.6" y="283.0" font-size="10.5" fill="#101826" text-anchor="middle" font-weight="normal">4</text><text x="744.4" y="283.0" font-size="10.5" fill="#3f4b63" text-anchor="start" font-weight="normal">17</text><text x="16.0" y="340.0" font-size="10.5" fill="#6b7690" text-anchor="start" font-weight="normal">排除即声明：每项排除都登记了理由（跨文件行为 · 上游差异 · 有意不评估），以机器可校验的清单双向绑定，防止清单与用例漂移</text></g></svg></div>
+    <table><tr><th>语言</th><th>对齐特性</th><th>声明排除</th><th>合计</th></tr><tr><td class="name">DBML</td><td>7</td><td>15</td><td>22</td></tr><tr><td class="name">WaveDrom</td><td>14</td><td>5</td><td>19</td></tr><tr><td class="name">D2</td><td>12</td><td>4</td><td>16</td></tr><tr><td class="name">Structurizr</td><td>7</td><td>6</td><td>13</td></tr><tr><td class="name">LikeC4</td><td>6</td><td>8</td><td>14</td></tr><tr><td class="name">nomnoml</td><td>9</td><td>3</td><td>12</td></tr><tr><td class="name">Pikchr</td><td>13</td><td>4</td><td>17</td></tr><tr class="total"><td>合计</td><td>68</td><td>45</td><td>113</td></tr></table>
+    <p class="note">排除不是缺口：跨文件加载从不执行、视图语法显式「报告而不评估」、上游无对应语义的输出不冒充对齐 —— 每一项都以机器可校验的清单登记并与用例双向绑定，清单与用例任何一侧漂移都会被测试拒绝。</p>
+  </div>
+</section>
+
+<section id="guardrails">
+  <div class="card">
+    <h2><span class="no">05</span>渲染护栏（每一条都被实测触发过）</h2>
+    <p class="sub">以下行为不是文档承诺，而是冻结探针的真实运行结果。</p>
+    <div class="guards">
+      <div class="guard"><div class="t">缩放闸门</div><div class="b">有效缩放被限制在 <b>0.05–16.0</b>，越界直接拒绝渲染（双向实测触发）。</div></div>
+      <div class="guard"><div class="t">单边画幅上限</div><div class="b">任一边超过 <b>32,768 px</b> 即拒绝；实测 32800x4800 请求被拒。</div></div>
+      <div class="guard"><div class="t">像素总量上限</div><div class="b">总像素超过 <b>100,000,000</b> 即拒绝；实测 11072x9040（100,090,880 px）被拒。</div></div>
+      <div class="guard"><div class="t">精确宽度</div><div class="b">--width 优先于缩放：实测请求 640，产出 <b>640x418</b>，分毫不差。</div></div>
+      <div class="guard"><div class="t">默认透明</div><div class="b">7 张冻结 PNG 的角像素 <b>alpha 全为 0</b>；--background 实测才出现画布填充。</div></div>
+      <div class="guard"><div class="t">XML 转义</div><div class="b">样例文本（unsafe &amp; visible，含尖括号与 &amp;）实测整体转义为实体输出，原始尖括号不出现；非有限几何直接拒绝。</div></div>
+      <div class="guard"><div class="t">禁用 unsafe</div><div class="b">清单级禁令 + 源码扫描：全源码树 <b>"unsafe" 唯一命中就是禁用声明本身</b>。</div></div>
+      <div class="guard"><div class="t">降级明示</div><div class="b">视图语法等有意不评估的行为以 <b>warning 通道</b>逐条告知（转录可查），--quiet 才静默；畸形输入以非零码拒收。</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="verification">
+  <div class="card">
+    <h2><span class="no">06</span>验证与确定性</h2>
+    <p class="sub">真实命令摘录（冻结转录原文）与四道交付门禁的结果。</p>
+    <pre class="term">$ diagram-render-rs schema.dbml --format dbml -o dbml.svg
+wrote <work>/dbml.svg (692x565 CSS px)
+exit-code: 0
+$ diagram-render-rs schema.dbml --format dbml -o dbml.png
+wrote <work>/dbml.png (1384x1130px)
+exit-code: 0
+
+$ diagram-render-rs workspace.dsl --format structurizr -o structurizr.svg
+warning: Structurizr `views` view syntax is retained, but this renderer shows the model rather than evaluating a view
+
+$ diagram-render-rs invalid.dbml --format dbml
+exit-code: 1 (expected non-zero)</pre>
+    <div class="batteries">
+      <div class="battery"><div class="ok">✓</div><div><div class="t">六禁令扫描</div><div class="d">页面与全部 SVG 面板通过六类禁令扫描，六条正向对照样本全部按预期命中</div></div></div>
+      <div class="battery"><div class="ok">✓</div><div><div class="t">SVG 面板门禁</div><div class="d">每张独立面板过几何布局检查，零告警零缺陷</div></div></div>
+      <div class="battery"><div class="ok">✓</div><div><div class="t">真空复跑</div><div class="d">删可重建产物后全链重建，A/B 两份与交付树最终状态逐字节一致</div></div></div>
+      <div class="battery"><div class="ok">✓</div><div><div class="t">指纹机检</div><div class="d">交付树全部产物 sha256 登记在册，重算逐项吻合（登记表自身除外）</div></div></div>
+    </div>
+    <p class="note">确定性实测：同一输入双跑，7 种格式的 SVG 与 PNG 全部逐字节一致；同源二次全新构建，二进制 sha256 完全一致（sha256 d97647108afce0b5…，4,744,320 B）。构建全程 --offline，依赖取自本机缓存，零网络。</p>
+  </div>
+</section>
+
+<section id="evidence">
+  <div class="card">
+    <h2><span class="no">07</span>证据索引（交付树 data/）</h2>
+    <p class="sub">冻结层 13 个文件 + 14 份渲染产物，一次写入永不改写；复核走确定性重建层与门禁，转录归一化规则（&lt;ts&gt; / &lt;dur&gt; / &lt;work&gt;）见交付树说明。</p>
+    <div class="evlist"><div class="evitem"><div class="f">engine-snapshot.txt</div><div class="w">引擎快照：HEAD、porcelain、工具链、锁文件哈希</div></div><div class="evitem"><div class="f">cargo-build-release.txt</div><div class="w">离线发布构建全量转录 + 二进制指纹</div></div><div class="evitem"><div class="f">cargo-test.txt</div><div class="w">全量测试转录（26 项通过）</div></div><div class="evitem"><div class="f">code-metrics.txt</div><div class="w">快照源码行数统计</div></div><div class="evitem"><div class="f">cli-surface.txt</div><div class="w">版本 / 帮助 / 主题清单实测转录</div></div><div class="evitem"><div class="f">cli-render-transcript.txt</div><div class="w">七格式真实渲染转录与产物指纹</div></div><div class="evitem"><div class="f">scene-stats.json</div><div class="w">结构化实测：尺寸 / 哈希 / 元素计数</div></div><div class="evitem"><div class="f">png-determinism.txt</div><div class="w">同输入双跑逐字节对照</div></div><div class="evitem"><div class="f">cargo-rebuild-determinism.txt</div><div class="w">二次全新构建二进制对照</div></div><div class="evitem"><div class="f">guardrail-probes.txt</div><div class="w">护栏探针（缩放 / 画幅 / 像素上限 / 转义 / 透明 / 依赖清单）</div></div><div class="evitem"><div class="f">feature-matrix-totals.txt</div><div class="w">特性矩阵逐语言统计</div></div><div class="evitem"><div class="f">engine-readme.txt</div><div class="w">引擎公开自述字节快照</div></div><div class="evitem"><div class="f">README.txt</div><div class="w">冻结层说明（永不改写）</div></div></div>
+    <p class="note">重建层会从同一引擎快照重渲染七份样例并与冻结层数值逐项对照；任何漂移都会让门禁失败，而不是悄悄改数。</p>
+  </div>
+</section>
+
+<footer>
+  <b>diagram-render-rs 可审计技术长图</b> · 引擎快照 b38ba079257a530691b8d2c700586fee5fb810ef · 锁文件 sha256 90aa2ca932524022… · 引擎自述快照 sha256 208c5fad55262348…<br>
+  本页零 JavaScript、零外链、自包含；所有数字与命令摘录均可在交付树 data/ 冻结证据中逐项核对。
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+# One-time guardrail probes against the frozen build (never regenerated)
+# every fact below is a real CLI invocation or byte inspection
+
+## P1 raster scale upper bound rejected
+$ echo 'a -> b' | diagram-render-rs - --format d2 -T png -o p1.png --scale 100
+diagram-render-rs: invalid render option: scale must be finite and between 0.05 and 16.0
+exit-code: 1
+
+## P2 raster scale lower bound rejected
+$ echo 'a -> b' | diagram-render-rs - --format d2 -T png -o p2.png --scale 0.01
+diagram-render-rs: invalid render option: scale must be finite and between 0.05 and 16.0
+exit-code: 1
+
+## P3 per-dimension pixel cap rejected (wide scene at scale 16)
+$ printf 'box; right; box; right; ... x10' | diagram-render-rs - --format pikchr -T png -o p3.png --scale 16
+diagram-render-rs: PNG render failed: rendered image exceeds 32768px dimension limit (32800x4800)
+exit-code: 1
+
+## P4 total-pixel cap rejected (schema fixture at scale 16)
+$ diagram-render-rs schema.dbml --format dbml -o p4.png --scale 16
+diagram-render-rs: PNG render failed: rendered image exceeds 100000000 pixel limit (11072x9040)
+exit-code: 1
+
+## P5 exact PNG width honored
+$ diagram-render-rs architecture.d2 --format d2 -o p5.png --width 640 --quiet
+
+exit-code: 0
+p5-png-dimensions: 640x418 (requested width 640)
+
+## P6 explicit canvas paint emitted
+$ echo 'a -> b' | diagram-render-rs - --format d2 -o p6.svg --background '#ffffff' --quiet
+
+exit-code: 0
+canvas-fill-element-present: True
+
+## P7 SVG text is XML-escaped
+$ echo 'a: "<unsafe & visible>"' | diagram-render-rs - --format d2 -o p7.svg --quiet
+
+exit-code: 0
+escaped-entity-present: True
+raw-angle-bracket-present: False
+
+## P8 frozen PNG canvases keep a transparent corner pixel
+dbml.png first-pixel-alpha: 0
+wavedrom.png first-pixel-alpha: 0
+d2.png first-pixel-alpha: 0
+structurizr.png first-pixel-alpha: 0
+likec4.png first-pixel-alpha: 0
+nomnoml.png first-pixel-alpha: 0
+pikchr.png first-pixel-alpha: 0
+
+## P9 unsafe scan over engine sources
+grep -rn unsafe src -> 1 hits
+/Users/junix/projects/plot/diagram-render-rs/src/lib.rs:7:#![forbid(unsafe_code)]
+
+## P10 dependency inventory from the engine manifest
+dep: clap: crates.io =4.6.6
+dep: diagram-ast-parser: git https://github.com/junix/diagram-ast-parser.git rev f34a45cb9ea60c08a5aa3190874035a6156fe284
+dep: diagram-theme: git https://github.com/junix/diagram-theme-rs.git rev 1f77cb8f19804ba03668fb3598a550c54c38cb9b
+dep: resvg: crates.io =0.48.1
+dep: serde_json: crates.io =1.0.151
+dep: thiserror: crates.io 2
+dep: unicode-width: crates.io 0.2
+dependency-count: 7

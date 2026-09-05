@@ -1,0 +1,182 @@
+{
+ "artifacts": [
+  {
+   "format": "dbml",
+   "fixture": "schema.dbml",
+   "svg": {
+    "bytes": 6054,
+    "sha256": "cad1972cff5b0a4aafdbf547e1b576918a41a690ec3c94d7039609e5c5f5109f",
+    "elements": {
+     "rect": 13,
+     "polyline": 1,
+     "polygon": 1,
+     "text": 21,
+     "g": 1,
+     "title": 1
+    },
+    "width": 692.0,
+    "height": 565.0,
+    "title": "DBML · commerce"
+   },
+   "png": {
+    "bytes": 62624,
+    "sha256": "152d0e3be2bb96623fa27a74d58eec290a02fa45471feb7f406bd3126da8877e",
+    "width": 1384,
+    "height": 1130
+   }
+  },
+  {
+   "format": "wavedrom",
+   "fixture": "timing.json5",
+   "svg": {
+    "bytes": 11628,
+    "sha256": "ce2d272464f816854dfed3d9d6a2de2ba3d30091c4fa1c76c1e3ed378cce0821",
+    "elements": {
+     "rect": 5,
+     "ellipse": 2,
+     "line": 16,
+     "polyline": 20,
+     "polygon": 1,
+     "text": 20,
+     "g": 1,
+     "title": 1
+    },
+    "width": 660.0,
+    "height": 324.0,
+    "title": "Bus transaction"
+   },
+   "png": {
+    "bytes": 26284,
+    "sha256": "dd5a960a0bd7a79b617f5f9ffc08e06a9b4d9d170a99ab1901aeadb9c9ae4098",
+    "width": 1320,
+    "height": 648
+   }
+  },
+  {
+   "format": "d2",
+   "fixture": "architecture.d2",
+   "svg": {
+    "bytes": 5348,
+    "sha256": "774692a9448bdb7f99f146d5ae76bcd2df37c99bf60b5fd2f0ec11dcf3e295bd",
+    "elements": {
+     "rect": 14,
+     "polyline": 2,
+     "polygon": 2,
+     "text": 14,
+     "g": 1,
+     "title": 1
+    },
+    "width": 692.0,
+    "height": 451.0,
+    "title": "D2 diagram"
+   },
+   "png": {
+    "bytes": 47284,
+    "sha256": "be6a167f7087cecb8ca945c982fc35b7bc854105a8dfc96892cdc1f11cd993de",
+    "width": 1384,
+    "height": 902
+   }
+  },
+  {
+   "format": "structurizr",
+   "fixture": "workspace.dsl",
+   "svg": {
+    "bytes": 6607,
+    "sha256": "0b23cb17ac0c07bed3946237c4255ead35edcad9cb29c99f61c103f45738ed86",
+    "elements": {
+     "rect": 18,
+     "polyline": 2,
+     "polygon": 2,
+     "text": 18,
+     "g": 1,
+     "title": 1
+    },
+    "width": 692.0,
+    "height": 470.0,
+    "title": "Structurizr · Payments"
+   },
+   "png": {
+    "bytes": 60403,
+    "sha256": "4572e874e28f9f8c01f6ad4af50263a235fb0aadaffa7312183c1f8df7888f05",
+    "width": 1384,
+    "height": 940
+   }
+  },
+  {
+   "format": "likec4",
+   "fixture": "model.c4",
+   "svg": {
+    "bytes": 5884,
+    "sha256": "01607666666526056597461efe9922bd4bd7fe048f16d6dd767edf480fe8c83f",
+    "elements": {
+     "rect": 18,
+     "polyline": 2,
+     "polygon": 2,
+     "text": 14,
+     "g": 1,
+     "title": 1
+    },
+    "width": 692.0,
+    "height": 432.0,
+    "title": "LikeC4 model"
+   },
+   "png": {
+    "bytes": 40787,
+    "sha256": "8d2817f2ae85de8db2879e1a88069f3a852735ad531adaad3474570123b525c7",
+    "width": 1384,
+    "height": 864
+   }
+  },
+  {
+   "format": "nomnoml",
+   "fixture": "classes.nomnoml",
+   "svg": {
+    "bytes": 4438,
+    "sha256": "837b6c5ddd3ff7abafa5f5a9acf6e0ea42b5a97ee442b6bf093ff84b4f15d4e6",
+    "elements": {
+     "rect": 12,
+     "polyline": 2,
+     "polygon": 2,
+     "text": 11,
+     "g": 1,
+     "title": 1
+    },
+    "width": 692.0,
+    "height": 451.0,
+    "title": "nomnoml classifier diagram"
+   },
+   "png": {
+    "bytes": 40504,
+    "sha256": "064c0f2c1593f523891909d6280e48a3952d7b03b07a5d45ad1d8cb534764a19",
+    "width": 1384,
+    "height": 902
+   }
+  },
+  {
+   "format": "pikchr",
+   "fixture": "flow.pikchr",
+   "svg": {
+    "bytes": 2876,
+    "sha256": "e3ef1fb33530499258b393feba7962640ab0165c3b27316bd341dfd59e4c57bd",
+    "elements": {
+     "rect": 3,
+     "ellipse": 1,
+     "line": 2,
+     "polygon": 2,
+     "text": 7,
+     "g": 1,
+     "title": 1
+    },
+    "width": 700.0,
+    "height": 300.0,
+    "title": "Pikchr geometric scene"
+   },
+   "png": {
+    "bytes": 23270,
+    "sha256": "f90e5bd9fc0846609794348bff10fc18eee988b5b51f3f24eda3902c41880409",
+    "width": 1400,
+    "height": 600
+   }
+  }
+ ]
+}

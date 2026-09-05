@@ -1,0 +1,11 @@
+# Feature matrix totals computed from the engine snapshot
+$ python summary of e2e/feature_matrix.json
+d2           aligned=12 intentional-exclusion= 4
+dbml         aligned= 7 intentional-exclusion=15
+likec4       aligned= 6 intentional-exclusion= 8
+nomnoml      aligned= 9 intentional-exclusion= 3
+pikchr       aligned=13 intentional-exclusion= 4
+structurizr  aligned= 7 intentional-exclusion= 6
+wavedrom     aligned=14 intentional-exclusion= 5
+TOTAL        aligned=68 intentional-exclusion=45
+languages: 7

@@ -1,0 +1,10 @@
+# Same-input double render: pass B compared byte-wise against pass A
+$ cmp pass-A pass-B  (fresh process per render, distinct output dirs)
+dbml svg=identical png=identical
+wavedrom svg=identical png=identical
+d2 svg=identical png=identical
+structurizr svg=identical png=identical
+likec4 svg=identical png=identical
+nomnoml svg=identical png=identical
+pikchr svg=identical png=identical
+summary: all byte-identical across two fresh processes
