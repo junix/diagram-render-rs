@@ -67,6 +67,10 @@ check-all: fmt-check clippy test check-themes e2e-test e2e
 examples:
     cargo run --release --example gallery -- examples/rendered
 
+# The gallery page's dedicated target: generates
+# examples/rendered/gallery.html via the same example run as `examples`.
+gallery: examples
+
 doc:
     cargo doc --open
 

@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>diagram-render-rs gallery</title><style>
+    :root{color-scheme:light dark;font-family:Inter,ui-sans-serif,system-ui,sans-serif;--page:#0b1220;--glow:#183255;--ink:#e8eef8;--lead:#aec1dd;--muted:#9fb1c9;--card:#101b2dcc;--line:#32445f;--shadow:#02071399;background:var(--page);color:var(--ink)}
+    @media (prefers-color-scheme:light){:root{--page:#f3f7fd;--glow:#dbe8fa;--ink:#152238;--lead:#435a7d;--muted:#556789;--card:#fffffff2;--line:#c5d2e6;--shadow:#2a3f6626}}
+    body{margin:0;background:radial-gradient(circle at top,var(--glow) 0,var(--page) 48rem);min-height:100vh}
+    header{max-width:1440px;margin:auto;padding:48px 28px 22px}h1{font-size:clamp(2rem,5vw,4rem);margin:0}.lead{color:var(--lead);max-width:72ch}
+    main{max-width:1440px;margin:auto;padding:18px 28px 64px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:26px}
+    article{border:1px solid var(--line);border-radius:20px;padding:20px;background:var(--card);box-shadow:0 18px 50px var(--shadow)}h2{margin:0 0 5px}p,summary{color:var(--muted)}
+    .toolbar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:20px}
+    .toolbar input{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;width:min(480px,100%)}
+    .toolbar input::placeholder{color:var(--muted)}
+    .toolbar #count{color:var(--muted)}
+    article[hidden]{display:none}
+    object,img{display:block;width:100%;height:auto;min-height:280px;max-height:720px;object-fit:contain;border-radius:12px;margin-top:18px;background-color:#fff;background-image:linear-gradient(45deg,#edf1f6 25%,transparent 25%),linear-gradient(-45deg,#edf1f6 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#edf1f6 75%),linear-gradient(-45deg,transparent 75%,#edf1f6 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0}
+    details{margin-top:16px}summary{cursor:pointer}
+    </style></head><body><header><h1>Typed AST → SVG / PNG</h1><p class="lead">Seven format-specific renderers share only a finite drawing scene and raster backend. The checkerboard exposes the transparent canvas contract.</p><div class="toolbar"><input id="filter" type="search" placeholder="Filter by name, format, or input file" aria-label="Filter diagrams"><span id="count" aria-live="polite">7 of 7 diagrams</span></div></header><main><article data-search="DBML schema dbml schema.dbml"><h2>DBML schema</h2><p>dbml · 692×565 CSS px</p><object data="schema.svg" type="image/svg+xml" aria-label="DBML schema SVG"></object><details><summary>2× PNG proof</summary><img src="schema.png" alt="DBML schema PNG"></details></article><article data-search="WaveDrom timing wavedrom timing.json5"><h2>WaveDrom timing</h2><p>wavedrom · 660×324 CSS px</p><object data="timing.svg" type="image/svg+xml" aria-label="WaveDrom timing SVG"></object><details><summary>2× PNG proof</summary><img src="timing.png" alt="WaveDrom timing PNG"></details></article><article data-search="D2 architecture d2 architecture.d2"><h2>D2 architecture</h2><p>d2 · 692×451 CSS px</p><object data="architecture.svg" type="image/svg+xml" aria-label="D2 architecture SVG"></object><details><summary>2× PNG proof</summary><img src="architecture.png" alt="D2 architecture PNG"></details></article><article data-search="Structurizr workspace structurizr workspace.dsl"><h2>Structurizr workspace</h2><p>structurizr · 692×470 CSS px</p><object data="workspace.svg" type="image/svg+xml" aria-label="Structurizr workspace SVG"></object><details><summary>2× PNG proof</summary><img src="workspace.png" alt="Structurizr workspace PNG"></details></article><article data-search="LikeC4 model likec4 model.c4"><h2>LikeC4 model</h2><p>likec4 · 692×432 CSS px</p><object data="model.svg" type="image/svg+xml" aria-label="LikeC4 model SVG"></object><details><summary>2× PNG proof</summary><img src="model.png" alt="LikeC4 model PNG"></details></article><article data-search="nomnoml classes nomnoml classes.nomnoml"><h2>nomnoml classes</h2><p>nomnoml · 692×451 CSS px</p><object data="classes.svg" type="image/svg+xml" aria-label="nomnoml classes SVG"></object><details><summary>2× PNG proof</summary><img src="classes.png" alt="nomnoml classes PNG"></details></article><article data-search="Pikchr flow pikchr flow.pikchr"><h2>Pikchr flow</h2><p>pikchr · 700×300 CSS px</p><object data="flow.svg" type="image/svg+xml" aria-label="Pikchr flow SVG"></object><details><summary>2× PNG proof</summary><img src="flow.png" alt="Pikchr flow PNG"></details></article><script>
+(function(){
+  var input=document.getElementById('filter'),count=document.getElementById('count');
+  var cards=[].slice.call(document.querySelectorAll('main article'));
+  function apply(){
+    var needle=(input.value||'').trim().toLowerCase(),shown=0;
+    cards.forEach(function(card){
+      var hit=!needle||(card.getAttribute('data-search')||'').toLowerCase().indexOf(needle)>=0;
+      card.hidden=!hit;
+      if(hit)shown++;
+    });
+    count.textContent=shown?shown+' of '+cards.length+' diagrams':'No diagrams match';
+  }
+  input.addEventListener('input',apply);
+  apply();
+})();
+</script></main></body></html>

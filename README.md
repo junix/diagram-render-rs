@@ -140,11 +140,12 @@ unless `RenderOptions::background` paints the canvas.
 ## Examples and validation
 
 The editable inputs live under [`examples/inputs`](examples/inputs). Generate
-seven SVGs, seven 2× PNGs, and a responsive visual gallery with:
+seven SVGs, seven 2× PNGs, and the responsive visual gallery
+[`examples/rendered/gallery.html`](examples/rendered/gallery.html) with:
 
 ```console
-just examples
-open examples/rendered/index.html
+just gallery
+open examples/rendered/gallery.html
 ```
 
 Run the full local gate:
