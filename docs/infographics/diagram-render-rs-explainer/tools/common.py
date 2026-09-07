@@ -18,6 +18,20 @@ FROZEN_HEAD = "b38ba079257a530691b8d2c700586fee5fb810ef"
 
 TREE_REL = "docs/infographics/diagram-render-rs-explainer"
 
+# Reproduce recipe for the normal post-delivery state where the engine repo
+# has moved past FROZEN_HEAD (the delivery commit itself advances HEAD).
+# The frozen snapshot predates the delivery tree, so the worktree gets the
+# tree copied in at its relative path; or pass --engine <worktree> together
+# with --tree pointing at the delivery tree in the main checkout.
+WORKTREE_RECIPE = (
+    "engine evolved beyond the frozen snapshot; to reproduce against the "
+    "frozen evidence:\n"
+    "  git -C <engine> worktree add /tmp/ign-drr/frozen-engine "
+    f"{FROZEN_HEAD}\n"
+    "  # then run the tools with --engine /tmp/ign-drr/frozen-engine "
+    "(--tree may keep pointing at the delivery tree)"
+)
+
 DEFAULT_ENGINE = os.environ.get("DRR_ENGINE", "")
 DEFAULT_TARGET_DIR = os.environ.get(
     "DRR_CARGO_TARGET_DIR", "/tmp/ign-drr/target-rebuild"
@@ -58,11 +72,29 @@ def resolve_tree(explicit: str | None) -> Path:
     return tree
 
 
-def guard_engine(engine_arg: str | None) -> Path:
-    """Verify the engine repo is at the frozen snapshot and unmodified.
+def guard_engine(engine_arg: str | None, *, require_frozen: bool = False) -> tuple[Path, str]:
+    """Verify the engine repo state relative to the frozen snapshot.
 
-    The only tolerated porcelain entries are untracked files inside the
-    delivery tree itself.
+    Two outcomes (audit-batteries section 7, post-commit idempotence):
+
+    - "frozen": HEAD == FROZEN_HEAD and the porcelain is clean outside the
+      delivery tree. Full strictness; this is the state the evidence was
+      frozen from (a fresh `git worktree add <dir> FROZEN_HEAD` is always
+      in this state).
+    - "evolved": HEAD has moved past FROZEN_HEAD. This is the normal
+      post-delivery state of the engine repo (the delivery commit itself
+      advances HEAD), NOT evidence drift: warn and point at the
+      frozen-worktree recipe. Evidence stays protected downstream --
+      every rebuild compares byte hashes against data/frozen and
+      hard-fails on any mismatch.
+
+    Hard fail (evidence drifted / unusable): repo missing, HEAD pinned at
+    FROZEN_HEAD but modified out-of-tree (the snapshot the evidence came
+    from was altered in place), or require_frozen while evolved (the
+    rebuild layer must run against the frozen snapshot; continuing from
+    an evolved HEAD can only end in a frozen-hash mismatch).
+
+    Returns (engine_path, mode).
     """
     engine = Path(engine_arg or DEFAULT_ENGINE).expanduser().resolve()
     if not (engine / "Cargo.toml").is_file():
@@ -77,18 +109,35 @@ def guard_engine(engine_arg: str | None) -> Path:
         ).stdout.strip()
 
     head = git("rev-parse", "HEAD")
-    if head != FROZEN_HEAD:
+    if head == FROZEN_HEAD:
+        dirty = [
+            line for line in git("status", "--porcelain", "-uall").splitlines() if line
+        ]
+        offenders = []
+        for line in dirty:
+            # XY <path>; tolerate every porcelain state (tracked edits,
+            # untracked files) as long as the path stays inside the tree.
+            path = line[3:].split(" -> ", 1)[-1].strip('"')
+            if not (path == TREE_REL or path.startswith(TREE_REL + "/")):
+                offenders.append(line)
+        if offenders:
+            raise GateError(
+                f"evidence drifted: engine is at the frozen HEAD but modified "
+                f"outside the tree: {offenders}"
+            )
+        return engine, "frozen"
+
+    print(
+        f"guard_engine: WARNING engine evolved: HEAD {head} != frozen "
+        f"{FROZEN_HEAD[:12]}…\n{WORKTREE_RECIPE}",
+        file=sys.stderr,
+    )
+    if require_frozen:
         raise GateError(
-            f"engine HEAD drifted: expected {FROZEN_HEAD}, got {head}"
+            "this tool must run against the frozen engine snapshot; "
+            "use the frozen-worktree recipe printed above"
         )
-    dirty = [
-        line for line in git("status", "--porcelain", "-uall").splitlines() if line
-    ]
-    allowed_prefix = f"?? {TREE_REL}/"
-    offenders = [line for line in dirty if not line.startswith(allowed_prefix)]
-    if offenders:
-        raise GateError(f"engine porcelain is dirty outside the tree: {offenders}")
-    return engine
+    return engine, "evolved"
 
 
 def sha256_bytes(data: bytes) -> str:

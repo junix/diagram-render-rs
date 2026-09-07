@@ -16,9 +16,15 @@
 | 二进制指纹 | sha256 `d97647108afce0b5…d155dabc6b`，4,744,320 B | cargo-build-release.txt:101-102 |
 | 构建方式 | `cargo build --offline --release`，全新 target 目录 | cargo-build-release.txt:1-2 |
 
-所有工具开工前经 `tools/common.py: guard_engine` 校验：HEAD 必须等于上表值，
-`git status --porcelain -uall` 除 `?? docs/infographics/diagram-render-rs-explainer/`
-前缀外必须为空，否则硬失败。
+所有工具开工前经 `tools/common.py: guard_engine` 两态校验（2026-09-06 refine
+改为防「提交后自咬」，原为单态硬失败）：
+
+- **frozen**（HEAD 等于上表值）：porcelain 除本树路径（无论未跟踪还是已跟踪
+  修改）外必须为空，否则判「证据漂移」硬失败；
+- **evolved**（HEAD 已越过冻结值，交付提交后的常态）：警告并给出冻结工作树
+  复核配方（`git worktree add /tmp/ign-drr/frozen-engine b38ba07…`，见
+  README「复核方法」）；证据保护不降级——所有重建环节仍与冻结层做字节哈希
+  对照，`rebuild.py` 在 evolved 态直接拒绝（require_frozen）。
 
 ## 2. 页面数字 → 冻结证据锚点
 
@@ -218,3 +224,68 @@ python3 生成」。负向对照（含 DBML/WaveDrom/resvg/--format dbml 的干�
 - 本验证文件完整：快照锚点 / 数字锚点 / 裁定 / 门禁 / 渲染断言 / 真空 /
   指纹 / 偏差 全部在册。
 - 树内零 `.pyc`、/tmp 临时目录已清理、引擎 porcelain 除本树外干净。
+
+## 10. 2026-09-06 refine（本轮修订记录）
+
+本轮按 survey（3 项 high 缺陷）做最小修复；冻结层一字节未动。
+
+### 修复项
+
+1. **svg-text-small（high）+ cjk-small（high）**：`tools/page.py` 面板
+   生成器字号提升——原 129 处 font-size 中 89 处 10.5 / 9 处 11.5，
+   仅 31% ≥11px 且 18 处中文 <12px；现全部 ≥11px（100%），中文全部
+   ≥12px。几何未动（面板宽高、条形布局、轴刻度位置均不变，仅字号与
+   标签估宽重算），四张面板经宽度越界机检（全部文本左右边界在
+   1120px 画布内）与 rsvg 渲染目检（pipeline 面板无碰撞）。
+   `page.py` 双跑逐字节一致；页面重渲染 1200×4754 CSS px、
+   full@2x 2400×9508（与 §5 记录同维，高度不变因面板高度为常量）。
+2. **gate-selfbite（high）**：
+   - `tools/common.py: guard_engine` 改两态：frozen（HEAD==冻结值，树外
+     porcelain 脏=证据漂移硬失败；本树条目无论跟踪态均容忍）/ evolved
+     （HEAD 已前进=交付后常态，警告 + 冻结工作树配方；证据保护由重建层
+     哈希对照兜底）。`rebuild.py` 调 require_frozen=True（evolved 态拒绝
+     并指向配方，因重建契约是与冻结层逐字节一致）。
+   - `tools/gates.py` B1 语料与禁令①文件名集钉在 `FROZEN_HEAD`
+     （只读 `git ls-tree`/`git show`，不再读活工作树），引擎演进不再改变
+     扫描结果；交付树自身路径结构上进不了语料（冻结快照早于本树）。
+   - prelude 的引擎 `target/` 残留检查改两态：frozen 态晚于冻结时间即
+     失败；evolved 态降为警告（引擎自身演进期构建非本工具链泄漏，
+     本工具链只写 /tmp）。
+   - 新增指纹豁免槽 `data/audit/post-commit.md`（提交后门禁实跑记录；
+     `rebuild.py` 第 6 步与 `gates.py` B4 均豁免，定点规则见
+     audit-batteries §7）。本轮 refine 未提交，实跑记录待主会话提交后
+     回填（槽内已注明「待回填」，不虚报已跑）。
+   - README「快照锚点」改两态描述、「复核方法」补冻结工作树配方与
+     `--skip-vacuum` 降级跑法、目录结构补 `data/audit/`。
+
+### 门禁重跑（本轮，evolved 态，--skip-vacuum）
+
+命令：`PYTHONDONTWRITEBYTECODE=1 python3 tools/gates.py --engine
+/Users/junix/projects/plot/diagram-render-rs --tree . --skip-vacuum`
+（引擎 HEAD ec987598…，guard 报 evolved 并打印工作树配方）
+
+- prelude：无 `<script>` / 无外链 / body 宽 1200px / zh-CN / 零 `.pyc`
+  全 PASS；引擎 `target/` 残留晚于冻结时间 → evolved 态按设计降为
+  WARN（引擎演进期自建，非本工具链泄漏；frozen 态下此项仍为 FAIL）。
+- B1 六禁令（语料钉 FROZEN_HEAD，只读 git 取证）：正向对照 6/6 PASS、
+  负向对照 PASS、index.html + 4 张面板 findings=0 PASS。
+- B2 svg-linter：4 张面板各 rc=0、findings=0，全 PASS。
+- B3 真空复跑：按降级跑法跳过（需冻结快照，走 README 工作树配方）；
+  待提交后实跑并回填 `data/audit/post-commit.md`。
+- B4 指纹机检：files=48、missing=0、extra=0、changed=0 PASS。
+- 指纹清单 `fingerprints.sha256` 已按 `rebuild.py` 第 6 步同款循环刷新
+  （48 项；`data/audit/post-commit.md` 为新增豁免项）。
+
+结论：ALL GATES PASS（B3 跳过项已如上披露）。
+
+### 本轮不做（按工单裁定，非本轮范围）
+
+- hero-not-subject（med）：页面未内嵌真实渲染产物为 hero。
+- no-claims-binding（med）：页面无 Cxx 声明徽标（锚点仍只在本文 §2）。
+- no-sidenote-track（med）：无右侧旁注轨。
+- contract.md（low）：未补契约文件。
+
+### 数字核对
+
+- 本节未新增任何引擎实测数字；页面数字全部仍由 `page.py` 从
+  `data/frozen/` 派生（§2 锚点表继续有效）。

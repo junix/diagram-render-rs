@@ -3,13 +3,16 @@
 
 Steps (all guarded against engine drift):
   1. verify the engine is at the frozen HEAD and clean outside this tree
+     (evolved engine: refused with the frozen-worktree recipe, see
+     tools/common.py guard_engine)
   2. cargo build --offline --release into the scratch target dir and assert
      the binary hash equals the frozen binary hash
   3. re-render the seven fixtures, normalize the transcript (<work>/<dur>/<ts>),
      and assert every SVG/PNG byte hash matches the frozen artifacts
   4. regenerate panels/*.svg and index.html from frozen evidence
   5. regenerate renders/ via the slice screenshot pipeline
-  6. rewrite fingerprints.sha256 over the whole tree (excluding itself)
+  6. rewrite fingerprints.sha256 over the whole tree (excluding itself and
+     the fingerprint-exempt data/audit/post-commit.md run records)
 
 Running this tool twice must leave every produced file byte-identical.
 
@@ -54,7 +57,11 @@ def main() -> int:
     args = parser.parse_args()
 
     tree = resolve_tree(args.tree)
-    engine = guard_engine(args.engine)
+    # require_frozen: the rebuild layer's contract is byte-identity against
+    # data/frozen, which only the frozen snapshot can produce. An evolved
+    # engine (the normal post-delivery state) is refused here with the
+    # frozen-worktree recipe; see guard_engine in tools/common.py.
+    engine, mode = guard_engine(args.engine, require_frozen=True)
     frozen = tree / "data" / "frozen"
     rebuild = tree / "data" / "rebuild"
     rebuild.mkdir(parents=True, exist_ok=True)
@@ -191,7 +198,8 @@ def main() -> int:
             raise GateError("screenshot stage failed:\n" + proc.stdout + proc.stderr)
 
     # ------------------------------------------------------------------
-    # 6. Fingerprint manifest over the whole tree (excluding itself)
+    # 6. Fingerprint manifest over the whole tree (excluding itself and
+    #    the fingerprint-exempt post-commit run records)
     # ------------------------------------------------------------------
     manifest = tree / "fingerprints.sha256"
     lines = []
@@ -199,7 +207,7 @@ def main() -> int:
         if not path.is_file():
             continue
         rel = path.relative_to(tree).as_posix()
-        if rel == "fingerprints.sha256":
+        if rel in ("fingerprints.sha256", "data/audit/post-commit.md"):
             continue
         lines.append(f"{sha256_file(path)}  {rel}")
     manifest.write_text("\n".join(lines) + "\n", encoding="utf-8")

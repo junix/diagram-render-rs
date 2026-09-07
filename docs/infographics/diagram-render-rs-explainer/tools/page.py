@@ -268,7 +268,7 @@ def panel_pipeline(facts: dict) -> str:
     y = 86
     out = [svg_open(W, H, "渲染管线：从源文本到 SVG 与 PNG")]
     out.append(text_el(16, 26, "渲染管线：解析在左、渲染在右，场景原语是两者的边界", 15, INK, weight="600"))
-    out.append(text_el(16, 46, "数据库模式 · 时序波形 · 架构模型 · 分类图 · 几何场景，七种语言在此汇入同一条降维路径", 11.5, MUTED))
+    out.append(text_el(16, 46, "数据库模式 · 时序波形 · 架构模型 · 分类图 · 几何场景，七种语言在此汇入同一条降维路径", 12, MUTED))
     for i, (t1, t2) in enumerate(boxes):
         fill = "#ffffff" if i not in (3,) else "#eaf2fc"
         stroke = BLUE if i in (1, 3) else "#c9d6ea"
@@ -277,7 +277,7 @@ def panel_pipeline(facts: dict) -> str:
             f' stroke="{stroke}" stroke-width="1.2"/>'
         )
         out.append(text_el(x + bw / 2, y + 27, t1, 13, INK, anchor="middle", weight="600"))
-        out.append(text_el(x + bw / 2, y + 47, t2, 10.5, MUTED, anchor="middle"))
+        out.append(text_el(x + bw / 2, y + 47, t2, 12, MUTED, anchor="middle"))
         if i < len(boxes) - 1:
             ax = x + bw + 2
             out.append(
@@ -295,7 +295,7 @@ def panel_pipeline(facts: dict) -> str:
     )
     out.append(
         text_el(W / 2, 202, f"解析归兄弟项目（修订 {parser_rev} 精确锁定）；渲染归本引擎 —— 消费已解析的类型化文档，不再二次解析",
-                10.5, MUTED, anchor="middle")
+                12, MUTED, anchor="middle")
     )
     out.append("</g></svg>")
     return "".join(out)
@@ -311,7 +311,7 @@ def panel_formats(facts: dict) -> str:
     y_axis, y_top = 322.0, 44.0
     out.append(
         axis_grid(x0, x1, y_top, y_axis, axis_max,
-                  [0, 20_000, 40_000, 60_000], ["0", "20 KB", "40 KB", "60 KB"], 10.5)
+                  [0, 20_000, 40_000, 60_000], ["0", "20 KB", "40 KB", "60 KB"], 11)
     )
     y = 52.0
     for fmt_id in facts["format_order"]:
@@ -321,9 +321,9 @@ def panel_formats(facts: dict) -> str:
             value = a[kind]["bytes"]
             w = value / axis_max * (x1 - x0)
             out.append(rrect_right(x0, by, w, 13, 4, color))
-            out.append(text_el(x0 + w + 8, by + 10.5, f"{fmt(value)} B", 10.5, INK2))
+            out.append(text_el(x0 + w + 8, by + 10.5, f"{fmt(value)} B", 11, INK2))
         y += 38
-    out.append(text_el(16, 358, "PNG 体积普遍大于 SVG；两者均随图元密度增长 —— 逐行数值见下表", 10.5, MUTED))
+    out.append(text_el(16, 358, "PNG 体积普遍大于 SVG；两者均随图元密度增长 —— 逐行数值见下表", 12, MUTED))
     out.append("</g></svg>")
     return "".join(out)
 
@@ -335,14 +335,14 @@ def panel_primitives(facts: dict) -> str:
     out = [svg_open(W, H, "场景原语构成：每种 DSL 的绘图原语计数")]
     out.append(text_el(16, 26, "降维之后：每份产物由哪些绘图原语构成", 15, INK, weight="600"))
     out.append(
-        legend(790, 26, [(BLUE, "矩形"), (ORANGE, "文本"), (AQUA, "线与曲线")], 11.5)
+        legend(790, 26, [(BLUE, "矩形"), (ORANGE, "文本"), (AQUA, "线与曲线")], 12)
     )
     y_axis, y_top = 296.0, 44.0
     out.append(
         axis_grid(x0, x1, y_top, y_axis, axis_max,
-                  [0, 20, 40, 60], ["0", "20", "40", "60"], 10.5)
+                  [0, 20, 40, 60], ["0", "20", "40", "60"], 11)
     )
-    out.append(text_el(995, y_axis + 16, "原语个数", 10.5, MUTED))
+    out.append(text_el(995, y_axis + 16, "原语个数", 12, MUTED))
     y = 52.0
     for fmt_id in facts["format_order"]:
         a = facts["stats"][fmt_id]["svg"]["elements"]
@@ -366,13 +366,13 @@ def panel_primitives(facts: dict) -> str:
             else:
                 out.append(f'<rect x="{cx:.1f}" y="{y}" width="{w:.1f}" height="{bh}" fill="{color}"/>')
             if w >= 26 and value > 0:
-                out.append(text_el(cx + w / 2, y + 15, str(value), 10.5, "#ffffff", anchor="middle"))
+                out.append(text_el(cx + w / 2, y + 15, str(value), 11, "#ffffff", anchor="middle"))
             cx += w + 2
-        out.append(text_el(cx + 8, y + 15, str(total), 10.5, INK2))
+        out.append(text_el(cx + 8, y + 15, str(total), 11, INK2))
         y += 36
     out.append(
         text_el(16, 334, "七份产物合计覆盖全部六类原语（矩形 椭圆 直线 折线 多边形 文本）；WaveDrom 的线与曲线最多（时序波形）",
-                10.5, MUTED)
+                12, MUTED)
     )
     out.append("</g></svg>")
     return "".join(out)
@@ -384,13 +384,13 @@ def panel_coverage(facts: dict) -> str:
     axis_max = 24.0
     out = [svg_open(W, H, "特性覆盖矩阵：对齐与声明排除，按语言")]
     out.append(text_el(16, 26, "与原版兼容 CLI 的特性对齐：68 项对齐 / 45 项声明排除", 15, INK, weight="600"))
-    out.append(legend(840, 26, [(BLUE, "对齐特性"), (NEUT, "声明排除")], 11.5))
+    out.append(legend(840, 26, [(BLUE, "对齐特性"), (NEUT, "声明排除")], 12))
     y_axis, y_top = 300.0, 44.0
     out.append(
         axis_grid(x0, x1, y_top, y_axis, axis_max,
-                  [0, 4, 8, 12, 16, 20, 24], ["0", "4", "8", "12", "16", "20", "24"], 10.5)
+                  [0, 4, 8, 12, 16, 20, 24], ["0", "4", "8", "12", "16", "20", "24"], 11)
     )
-    out.append(text_el(995, y_axis + 16, "特性项数", 10.5, MUTED))
+    out.append(text_el(995, y_axis + 16, "特性项数", 12, MUTED))
     y = 52.0
     for lang in LANG_ORDER:
         aligned, excluded = facts["matrix"][lang]
@@ -402,17 +402,17 @@ def panel_coverage(facts: dict) -> str:
         if wa > 0:
             out.append(f'<rect x="{x0:.1f}" y="{y}" width="{wa:.1f}" height="{bh}" fill="{BLUE}"/>')
             if wa >= 22:
-                out.append(text_el(x0 + wa / 2, y + 15, str(aligned), 10.5, "#ffffff", anchor="middle"))
+                out.append(text_el(x0 + wa / 2, y + 15, str(aligned), 11, "#ffffff", anchor="middle"))
         if we > 0:
             out.append(rrect_right(x0 + wa + 2, y, we, bh, 4, NEUT))
             if we >= 22:
-                out.append(text_el(x0 + wa + 2 + we / 2, y + 15, str(excluded), 10.5, INK, anchor="middle"))
+                out.append(text_el(x0 + wa + 2 + we / 2, y + 15, str(excluded), 11, INK, anchor="middle"))
         stack_end = x0 + wa + we + 2
-        out.append(text_el(stack_end + 8, y + 15, str(total), 10.5, INK2))
+        out.append(text_el(stack_end + 8, y + 15, str(total), 11, INK2))
         y += 36
     out.append(
         text_el(16, 340, "排除即声明：每项排除都登记了理由（跨文件行为 · 上游差异 · 有意不评估），以机器可校验的清单双向绑定，防止清单与用例漂移",
-                10.5, MUTED)
+                12, MUTED)
     )
     out.append("</g></svg>")
     return "".join(out)

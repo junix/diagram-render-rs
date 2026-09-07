@@ -13,8 +13,17 @@ Four batteries, all of which must pass:
       from itself)
 
 Plus a prelude of structural checks (self-containment, no pycache, engine
-still at the frozen snapshot, no engine target/ residue). Gates print
-their records and write nothing into the tree.
+guard two-state, no engine target/ residue). Gates print their records
+and write nothing into the tree.
+
+Post-commit self-bite protection (audit-batteries section 7): the B1
+corpus and ban-1 file-name set are harvested from FROZEN_HEAD via
+read-only git (ls-tree/show), never from the live working tree, so the
+scan stays stable after the engine evolves; the delivery tree's own path
+cannot enter the corpus because the frozen snapshot predates it. When
+HEAD has moved past FROZEN_HEAD, guard_engine warns and points at the
+frozen-worktree recipe; B3's vacuum rebuild then needs that worktree
+(use --skip-vacuum against an evolved engine).
 
 Usage:
     python3 tools/gates.py --engine /path/to/diagram-render-rs [--tree .] [--skip-vacuum]
@@ -37,6 +46,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import (  # noqa: E402
     DEFAULT_SVG_LINTER,
     FORMATS,
+    FROZEN_HEAD,
     GateError,
     guard_engine,
     resolve_tree,
@@ -114,13 +124,53 @@ def flatten_with_transcript_spans(text: str) -> tuple[str, list[tuple[int, int]]
     return " ".join(segments), spans
 
 
+def frozen_files(engine: Path) -> list[str]:
+    """All blob paths of the frozen snapshot (read-only git ls-tree)."""
+    return subprocess.run(
+        ["git", "-C", str(engine), "ls-tree", "-r", "--name-only", FROZEN_HEAD],
+        check=True, capture_output=True, text=True,
+    ).stdout.splitlines()
+
+
+def frozen_blob(engine: Path, rel: str) -> str:
+    """File content at the frozen snapshot (read-only git show)."""
+    return subprocess.run(
+        ["git", "-C", str(engine), "show", f"{FROZEN_HEAD}:{rel}"],
+        check=True, capture_output=True, text=True,
+    ).stdout
+
+
+def corpus_relpaths(files: list[str]) -> list[str]:
+    """Frozen-tree paths matching the frozen-era corpus glob set
+    (src/**/*.rs, tests/*.rs, examples/*.rs, e2e/*.go, justfile,
+    Cargo.toml — same semantics as the original Path.glob harvest)."""
+    out = []
+    for rel in files:
+        if rel in ("justfile", "Cargo.toml"):
+            out.append(rel)
+            continue
+        if "/" not in rel:
+            continue
+        top, rest = rel.split("/", 1)
+        if top == "src" and rel.endswith(".rs"):
+            out.append(rel)
+        elif top in ("tests", "examples") and "/" not in rest and rest.endswith(".rs"):
+            out.append(rel)
+        elif top == "e2e" and "/" not in rest and rest.endswith(".go"):
+            out.append(rel)
+    return out
+
+
 def harvest_corpus(engine: Path) -> str:
-    parts = []
-    for pattern in ("src/**/*.rs", "tests/*.rs", "examples/*.rs", "e2e/*.go",
-                    "justfile", "Cargo.toml"):
-        for path in engine.glob(pattern):
-            parts.append(path.read_text())
-    return "\n".join(parts)
+    """Corpus text pinned to FROZEN_HEAD (never the live working tree).
+
+    Keeps the six-ban scanners byte-stable after the engine evolves and
+    structurally excludes the delivery tree's own path (the frozen
+    snapshot predates the tree).
+    """
+    return "\n".join(
+        frozen_blob(engine, rel) for rel in corpus_relpaths(frozen_files(engine))
+    )
 
 
 def visible_text(path: Path) -> str:
@@ -152,12 +202,23 @@ def build_scanners(engine: Path):
     banned_idents -= ALLOW_NOTES
     banned_idents = {t for t in banned_idents if t not in ALLOW_NOTES}
 
+    # Ban-1 file-name set, frozen-pinned like the corpus (same semantics
+    # as the original live Path.glob harvest: src/**/*.rs, src/*,
+    # tests/*.rs, examples/*.rs, e2e/*, .github/**/*; ls-tree -r lists
+    # blobs only, so "direct child" == "no further slash").
     engine_files: set[str] = set()
-    for pattern in ("src/**/*.rs", "src/*", "tests/*.rs", "examples/*.rs",
-                    "e2e/*", ".github/**/*"):
-        for path in engine.glob(pattern):
-            if path.is_file():
-                engine_files.add(path.name)
+    for rel in frozen_files(engine):
+        if "/" not in rel:
+            continue
+        top, rest = rel.split("/", 1)
+        if top == "src" and (rest.endswith(".rs") or "/" not in rest):
+            engine_files.add(rest.rsplit("/", 1)[-1])
+        elif top in ("tests", "examples") and "/" not in rest and rest.endswith(".rs"):
+            engine_files.add(rest)
+        elif top == "e2e" and "/" not in rest:
+            engine_files.add(rest)
+        elif top == ".github":
+            engine_files.add(rest.rsplit("/", 1)[-1])
     engine_files -= {"Cargo.toml", "Cargo.lock", "LICENSE", "README.md",
                      ".gitignore", "rust-toolchain.toml"}
     engine_files = {f for f in engine_files if f not in (".DS_Store",)}
@@ -271,13 +332,15 @@ def main() -> int:
     args = parser.parse_args()
 
     tree = resolve_tree(args.tree)
-    engine = guard_engine(args.engine)
+    engine, mode = guard_engine(args.engine)
     failures: list[str] = []
 
     # ------------------------------------------------------------------
     # Prelude: structural checks
     # ------------------------------------------------------------------
     print("== prelude ==")
+    print(f"  engine guard mode: {mode}"
+          + (" (corpus pinned to FROZEN_HEAD)" if mode == "evolved" else ""))
     page = (tree / "index.html").read_text()
     page_no_ns = page.replace(NS_ATTR, "xmlns=NS")
     checks = [
@@ -301,7 +364,11 @@ def main() -> int:
     if target_residue.exists():
         # Residue that predates the frozen snapshot is pre-existing engine
         # state; this toolchain builds exclusively into /tmp target dirs and
-        # must not add to it. Anything newer than the freeze is a failure.
+        # must not add to it. Newer-than-freeze residue is a failure only in
+        # frozen mode (the engine claims to be exactly the frozen state). In
+        # evolved mode the engine has legally moved on and may have built
+        # itself; that is not evidence drift from this toolchain, so it
+        # degrades to a warning pointing at the frozen-worktree recipe.
         import datetime
         captured = re.search(
             r"captured-utc: ([\d-]+T[\d:]+)Z",
@@ -315,11 +382,19 @@ def main() -> int:
         )
         newest_dt = datetime.datetime.fromtimestamp(newest).astimezone()
         if newest_dt > captured_dt:
-            failures.append(
-                f"prelude: engine target/ has files newer than the freeze "
-                f"({newest_dt.isoformat()})"
-            )
-            print(f"  [FAIL] engine target/ residue newer than freeze")
+            if mode == "frozen":
+                failures.append(
+                    f"prelude: engine target/ has files newer than the freeze "
+                    f"({newest_dt.isoformat()})"
+                )
+                print(f"  [FAIL] engine target/ residue newer than freeze")
+            else:
+                print(
+                    "  [WARN] engine target/ residue newer than freeze "
+                    "(engine evolved and built itself; disclosed, not "
+                    "evidence drift -- this toolchain builds only into /tmp; "
+                    "frozen-worktree recipe reproduces cleanly)"
+                )
         else:
             print(
                 "  [PASS] engine target/ residue pre-dates the freeze "
@@ -444,7 +519,8 @@ def main() -> int:
             p.relative_to(tree).as_posix(): sha256_file(p)
             for p in sorted(tree.rglob("*"))
             if p.is_file()
-            and p.relative_to(tree).as_posix() not in (".DS_Store", "fingerprints.sha256")
+            and p.relative_to(tree).as_posix() not in (
+                ".DS_Store", "fingerprints.sha256", "data/audit/post-commit.md")
             and "__pycache__" not in p.relative_to(tree).as_posix()
         }
         missing = sorted(set(actual) - set(listed))

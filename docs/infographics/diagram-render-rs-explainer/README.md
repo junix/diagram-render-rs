@@ -20,8 +20,18 @@
 | rustc / cargo | 1.98.0 (Homebrew) |
 | Cargo.lock sha256 | 见 `data/frozen/engine-snapshot.txt` |
 
-任何工具开工前都会校验引擎 HEAD 仍等于上表值、且 porcelain 除本树外干净；
-漂移即硬失败（`tools/common.py: guard_engine`）。
+引擎守卫（`tools/common.py: guard_engine`）两态区分，防「提交后自咬」：
+
+- **frozen**：HEAD 仍等于上表值，且 porcelain 除本树外干净（本树条目无论
+  未跟踪还是已跟踪修改均容忍）。此时若快照被就地改动（HEAD 相同但树脏），
+  判「证据漂移」，硬失败。
+- **evolved**：HEAD 已越过冻结值。这是交付提交后的常态（交付提交本身就会
+  前进 HEAD），不是证据漂移：警告并给出冻结工作树配方（见下）。证据仍受
+  保护——所有重建环节与冻结层做字节哈希对照，任何失配硬失败。
+- B1 六禁令语料钉在冻结 `FROZEN_HEAD` 上（`git ls-tree`/`git show` 只读
+  取证），不随引擎演进而变；交付树自身路径结构上进不了语料（冻结快照早于
+  本树）。`rebuild.py` 要求 frozen 态（ evolved 态直接拒绝并指向配方），
+  因为重建层的契约是与冻结层逐字节一致，只有冻结快照能产出。
 
 ## 目录结构
 
@@ -32,8 +42,9 @@ diagram-render-rs-explainer/
   renders/              full@2x.png / grayscale.png / thumb.png
   data/frozen/          一次性冻结证据（13 个文件 + artifacts/ 14 份产物）
   data/rebuild/         确定性重建层（重跑逐字节一致）
+  data/audit/           提交后门禁实跑记录（指纹豁免，B4 不校验）
   tools/                本树全部工具（纯标准库 Python 3）
-  fingerprints.sha256   全树产物 sha256 清单（不含清单自身）
+  fingerprints.sha256   全树产物 sha256 清单（不含清单自身与 data/audit/）
   VERIFICATION.md       验证记录：数字锚点 / 裁定 / 门禁 / 偏差
 ```
 
@@ -66,6 +77,29 @@ diagram-render-rs-explainer/
 
 ## 复核方法
 
+冻结工作树配方（引擎 HEAD 已越过 `b38ba07…` 时的正确复核姿势；交付
+提交后即处于此态）：
+
+```sh
+# 1) 冻结工作树：把冻结快照检出为独立工作树（只增加 .git/worktrees
+#    管理数据，不动主检出）
+git -C ~/projects/plot/diagram-render-rs worktree add \
+    /tmp/ign-drr/frozen-engine b38ba079257a530691b8d2c700586fee5fb810ef
+
+# 2) 完整确定性重建 + 四道门禁（--tree 仍指向主检出里的交付树）
+cd <交付树>
+PYTHONDONTWRITEBYTECODE=1 python3 tools/rebuild.py \
+    --engine /tmp/ign-drr/frozen-engine --tree .
+PYTHONDONTWRITEBYTECODE=1 python3 tools/gates.py \
+    --engine /tmp/ign-drr/frozen-engine --tree .
+
+# 3) 用后清理
+git -C ~/projects/plot/diagram-render-rs worktree remove \
+    /tmp/ign-drr/frozen-engine
+```
+
+引擎仍停在冻结 HEAD 时（或上面的工作树里），等价于：
+
 ```sh
 # 完整确定性重建（引擎校验 + 离线构建 + 重渲染 + 页面 + 截图 + 指纹）
 PYTHONDONTWRITEBYTECODE=1 python3 tools/rebuild.py \
@@ -75,6 +109,12 @@ PYTHONDONTWRITEBYTECODE=1 python3 tools/rebuild.py \
 PYTHONDONTWRITEBYTECODE=1 python3 tools/gates.py \
     --engine ~/projects/plot/diagram-render-rs --tree .
 ```
+
+对已演进的引擎仓不建工作树的降级跑法：
+`gates.py --engine ~/projects/plot/diagram-render-rs --tree . --skip-vacuum`
+—— prelude/B1（语料钉冻结 HEAD）/B2/B4 照常可跑；B3 真空复跑与
+`rebuild.py` 需要冻结快照，走上面的工作树配方。提交后的实跑结果记录进
+`data/audit/post-commit.md`（指纹豁免，见该文件说明）。
 
 - 冻结层（`data/frozen/`）一次写入永不改写：任何冻结工具在目标文件已存在时
   直接拒绝运行；复核只走重建层与门禁，绝不回头改数。
