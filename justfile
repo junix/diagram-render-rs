@@ -89,8 +89,7 @@ target_dir := env("CARGO_TARGET_DIR", justfile_directory() / "target")
 
 install: build-release
     mkdir -p "{{ install_bin }}"
-    cp "{{ target_dir }}/release/diagram-render-rs" "{{ install_bin }}/diagram-render-rs"
-    chmod +x "{{ install_bin }}/diagram-render-rs"
+    @set -eu; dest="{{ install_bin }}/diagram-render-rs"; mkdir -p "$(dirname "$dest")"; tmp="$(mktemp "{{ install_bin }}/.diagram-render-rs.XXXXXX")"; trap 'rm -f "$tmp"' EXIT; cp "{{ target_dir }}/release/diagram-render-rs" "$tmp"; chmod 755 "$tmp"; if [ "$(uname -s)" = "Darwin" ]; then xattr -c "$tmp" 2>/dev/null || true; codesign --force --sign - "$tmp"; fi; mv -f "$tmp" "$dest"
     echo "Installed {{ install_bin }}/diagram-render-rs"
 
 # Remove untracked intermediates. Preview: CLEAN_DRY_RUN=1 just clean-artifacts.
