@@ -469,4 +469,3 @@ fn draw_arrowhead(scene: &mut Scene, tip: Point, previous: Point, color: &str) {
 #[cfg(test)]
 #[path = "wavedrom_tests.rs"]
 mod tests;
-
