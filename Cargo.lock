@@ -190,7 +190,7 @@ checksum = "be1e0bca6c3637f992fc1cc7cbc52a78c1ef6db076dbf1059c4323d6a2048376"
 [[package]]
 name = "diagram-ast-parser"
 version = "0.1.0"
-source = "git+https://github.com/junix/diagram-ast-parser.git?rev=f34a45cb9ea60c08a5aa3190874035a6156fe284#f34a45cb9ea60c08a5aa3190874035a6156fe284"
+source = "git+https://github.com/junix/diagram-ast-parser.git?rev=a8540652364157838d8c6398f08d9abfb4efcb93#a8540652364157838d8c6398f08d9abfb4efcb93"
 dependencies = [
  "clap",
  "serde",
@@ -214,7 +214,7 @@ dependencies = [
 [[package]]
 name = "diagram-theme"
 version = "0.1.0"
-source = "git+https://github.com/junix/diagram-theme-rs.git?rev=1f77cb8f19804ba03668fb3598a550c54c38cb9b#1f77cb8f19804ba03668fb3598a550c54c38cb9b"
+source = "git+https://github.com/junix/diagram-theme-rs.git?rev=0d6530f0ccea5a61b0d2fef9a3e164ff816ca852#0d6530f0ccea5a61b0d2fef9a3e164ff816ca852"
 dependencies = [
  "clap",
 ]
