@@ -1,12 +1,16 @@
 set shell := ["bash", "-euo", "pipefail", "-c"]
 
+# Build stamp (ADR-1168 R2): git short sha plus ".dirty" when the worktree is
+# not clean, embedded into `--version` via PM_BUILD_SHA on every cargo build.
+stamp := `git rev-parse --short HEAD` + `(git diff --quiet && git diff --cached --quiet) >/dev/null 2>&1 || printf .dirty`
+
 default: build
 
 build:
-    cargo build
+    PM_BUILD_SHA=g{{stamp}} cargo build
 
 build-release:
-    cargo build --release
+    PM_BUILD_SHA=g{{stamp}} cargo build --release
 
 test:
     cargo test --all-targets --all-features

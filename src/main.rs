@@ -10,10 +10,24 @@ use diagram_render_rs::{
 use diagram_theme::Resolved;
 use diagram_theme::cli::{AFTER_HELP, THEME_HELP, listing_json, listing_plain, theme_value_parser};
 
+/// Semver plus build stamp (ADR-1168 R2): `PM_BUILD_SHA` is set by the justfile
+/// build recipes to `g<short sha>` (with `.dirty` on a dirty worktree), so the
+/// printed version can be compared against the source checkout. The stamp is
+/// baked in at compile time; `Box::leak` lends it a `&'static str` lifetime,
+/// which is what clap's `version` attribute accepts.
+fn version() -> &'static str {
+    match option_env!("PM_BUILD_SHA") {
+        Some(stamp) => {
+            Box::leak(format!("{}+{}", env!("CARGO_PKG_VERSION"), stamp).into_boxed_str())
+        }
+        None => env!("CARGO_PKG_VERSION"),
+    }
+}
+
 #[derive(Debug, Parser)]
 #[command(
     name = "diagram-render-rs",
-    version,
+    version = version(),
     about = "Render typed DBML, WaveDrom, D2, Structurizr, LikeC4, nomnoml, and Pikchr ASTs to SVG or PNG",
     after_help = AFTER_HELP
 )]
