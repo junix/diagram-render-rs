@@ -82,13 +82,61 @@ fn serialized_ast_round_trip_skips_source_parsing() {
 
 #[test]
 fn requested_png_width_is_exact() {
-    let options = RenderOptions {
-        width: Some(640),
-        ..RenderOptions::default()
-    };
-    let rendered =
-        render_source(DiagramFormat::D2, CASES[2].1, OutputFormat::Png, &options).expect("render");
-    assert_eq!(rendered.pixel_dimensions.expect("PNG dimensions").0, 640);
+    let cases: &[(DiagramFormat, &str, &[u32])] = &[
+        (DiagramFormat::D2, CASES[2].1, &[640]),
+        (
+            DiagramFormat::WaveDrom,
+            "{signal:[{wave:'0'}]}",
+            &[43, 44, 45, 660, 701, 702, 703],
+        ),
+        (
+            DiagramFormat::WaveDrom,
+            "{signal:[{wave:'0101010101'}]}",
+            &[44, 45, 46, 702],
+        ),
+        (
+            DiagramFormat::WaveDrom,
+            "{signal:[{wave:'01010101010101010101'}]}",
+            &[62, 63, 64, 1162],
+        ),
+    ];
+    for &(format, source, widths) in cases {
+        for &width in widths {
+            let options = RenderOptions {
+                width: Some(width),
+                ..RenderOptions::default()
+            };
+            let rendered = render_source(format, source, OutputFormat::Png, &options)
+                .unwrap_or_else(|error| panic!("{format} at width {width}: {error}"));
+            let dimensions = rendered.pixel_dimensions.expect("PNG dimensions");
+            assert_eq!(dimensions.0, width, "{format} at width {width}");
+            let png = rendered.png.expect("PNG requested");
+            let decoded = resvg::tiny_skia::Pixmap::decode_png(&png).expect("valid PNG");
+            assert_eq!(
+                (decoded.width(), decoded.height()),
+                dimensions,
+                "{format} at width {width}"
+            );
+        }
+    }
+}
+
+#[test]
+fn invalid_requested_png_width_is_rejected() {
+    for width in [0, 32, 10_561, u32::MAX] {
+        let options = RenderOptions {
+            width: Some(width),
+            ..RenderOptions::default()
+        };
+        let error = render_source(
+            DiagramFormat::WaveDrom,
+            "{signal:[{wave:'0'}]}",
+            OutputFormat::Png,
+            &options,
+        )
+        .expect_err("requested width must be bounded");
+        assert!(matches!(error, RenderError::InvalidOption(_)), "width {width}");
+    }
 }
 
 #[test]

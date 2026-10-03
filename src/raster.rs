@@ -25,7 +25,10 @@ pub(crate) fn svg_to_png(svg: &str, scale: f32, width: Option<u32>) -> Result<Ra
         ));
     }
 
-    let pixel_width = (source_size.width() * effective_scale).ceil() as u32;
+    // Reconstructing an explicit width through f32 can round just above the
+    // requested integer, making ceil add an unwanted pixel.
+    let pixel_width =
+        width.unwrap_or_else(|| (source_size.width() * effective_scale).ceil() as u32);
     let pixel_height = (source_size.height() * effective_scale).ceil() as u32;
     if pixel_width == 0 || pixel_height == 0 {
         return Err(RenderError::Png("rendered image has zero size".to_owned()));
@@ -54,3 +57,7 @@ pub(crate) fn svg_to_png(svg: &str, scale: f32, width: Option<u32>) -> Result<Ra
         height: pixel_height,
     })
 }
+
+#[cfg(test)]
+#[path = "raster_tests.rs"]
+mod tests;
