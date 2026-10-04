@@ -9,8 +9,8 @@ use diagram_render_rs::{
 use diagram_theme::Theme as Palette;
 use diagram_theme::output::{Note, Report, check_files, declares_author_canvas};
 
-// Unlabelled edges avoid the separately tracked connector-label opacity issue.
-// This fixture isolates the canvas contract, not every renderer's theme mapping.
+// Unlabelled edges isolate the canvas contract. Labelled connectors and every
+// gallery family are covered separately by gallery_contract.
 const SOURCE: &str = "a -> b";
 
 struct OutputPair {

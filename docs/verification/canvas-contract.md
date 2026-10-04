@@ -30,10 +30,12 @@ resulting SVG and PNG files to `diagram_theme::output::check_files`:
   `full-bleed`, `palette`, and PNG `canvas` rules. The negative case retains the
   actual rendered PNG rather than substituting a synthetic image.
 
-The fixture is an unlabelled D2 edge (`a -> b`). It isolates the canvas contract
-from the known, separate connector-label `fill-opacity="0.98"` palette issue
-documented by `just check-themes`. It does not claim all gallery drawings pass
-the complete output gate. Canonical themes are used because the gate accepts
+The fixture is an unlabelled D2 edge (`a -> b`). It isolates the canvas contract;
+this original run did not check the full gallery. The earlier claim that the
+0.98-opacity labels violate the pinned palette gate was stale: the declared
+checker already accepts token colors at arbitrary opacity. See
+[the subsequent gallery verification](gallery-contract.md) for all seven
+fixtures in all fourteen themes. Canonical themes are used because the gate accepts
 shared palettes; the legacy default `light` palette is intentionally distinct
 and remains covered by the existing renderer tests.
 

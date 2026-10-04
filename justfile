@@ -42,27 +42,12 @@ fmt-check:
 clippy:
     cargo clippy --all-targets --all-features -- -D warnings
 
-# The ADR-1137 output gate over all fourteen canonical themes: canvas,
-# full-bleed, band, knock-out and palette containment. It shells out to an
-# installed `diagram-theme`, so it stays out of `test`, which every project here
-# has to offer on a machine that has cloned nothing else.
-#
-# Deliberately not yet a dependency of `check-all`: the connector-label knock-out
-# in src/renderers/cards.rs paints `surface_alt` at fill-opacity 0.98, which the
-# palette rule reads as a token at alpha 0xfa — neither opaque nor a declared
-# wash — and every theme trips on it. Making that pill opaque re-blesses
-# examples/rendered, which is ADR-1137 step 10, not step 6.
-check-themes: build-release
-    #!/usr/bin/env bash
-    set -euo pipefail
-    bin="{{ target_dir }}/release/diagram-render-rs"
-    work="$(mktemp -d)"
-    trap 'rm -rf "$work"' EXIT
-    for theme in $("$bin" themes); do
-        "$bin" examples/inputs/schema.dbml -f dbml --theme "$theme" -o "$work/out.svg" --quiet
-        "$bin" examples/inputs/schema.dbml -f dbml --theme "$theme" -o "$work/out.png" --quiet
-        diagram-theme check-output --theme "$theme" --svg "$work/out.svg" --png "$work/out.png"
-    done
+# The ADR-1137 output gate over all seven gallery fixtures and fourteen
+# canonical themes. The integration test renders real CLI SVG/PNG pairs and
+# links the exact shared checker declared in Cargo.toml/Cargo.lock, so an older
+# installed diagram-theme cannot silently select a different contract.
+check-themes:
+    cargo test --locked --test gallery_contract
 
 check-all: fmt-check clippy test check-themes e2e-test e2e
 

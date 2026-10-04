@@ -95,9 +95,12 @@ An explicit `--background` is emitted as a full-canvas rectangle marked
 author-requested canvas in both the SVG and its paired PNG; with no background
 option, neither a canvas rectangle nor an exemption is emitted.
 `cargo test --test canvas_contract` renders real SVG/PNG pairs in all fourteen
-canonical themes and runs the pinned shared gate over them. This focused check
-does not require an installed `diagram-theme` executable; the broader
-`just check-themes` command remains a separate gallery check.
+canonical themes and runs the pinned shared gate over them. `just check-themes`
+(or `cargo test --locked --test gallery_contract`) checks all seven gallery
+fixtures in every canonical theme through the real CLI, including the existing
+0.98-opacity connector labels. Both checks use the exact pinned shared checker
+and require no separately installed `diagram-theme` executable. The gallery
+gate rejects failures, skipped coverage, and unexpected exemptions.
 
 If a pipeline already has the serialized parser AST, skip source parsing:
 
