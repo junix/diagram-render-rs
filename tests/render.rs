@@ -135,7 +135,10 @@ fn invalid_requested_png_width_is_rejected() {
             &options,
         )
         .expect_err("requested width must be bounded");
-        assert!(matches!(error, RenderError::InvalidOption(_)), "width {width}");
+        assert!(
+            matches!(error, RenderError::InvalidOption(_)),
+            "width {width}"
+        );
     }
 }
 

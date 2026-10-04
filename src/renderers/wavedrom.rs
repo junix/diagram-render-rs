@@ -6,8 +6,8 @@ use diagram_ast_parser::ast::wavedrom::{
 
 use super::RenderPlan;
 use super::cards::{push_text, truncate};
-use crate::Theme;
 use crate::scene::{Point, Primitive, Rect, Scene, Stroke, TextAnchor, TextWeight};
+use crate::{RenderError, Result, Theme};
 
 const LABEL_WIDTH: f32 = 178.0;
 const CELL_WIDTH: f32 = 46.0;
@@ -18,7 +18,7 @@ struct LaneView<'a> {
     lane: &'a WaveLane,
 }
 
-pub(crate) fn render(document: &WaveDromDocument, theme: &Theme) -> RenderPlan {
+pub(crate) fn render(document: &WaveDromDocument, theme: &Theme) -> Result<RenderPlan> {
     let mut lanes = Vec::new();
     if let Some(timing) = &document.timing {
         flatten_lanes(&timing.signal, None, &mut lanes);
@@ -69,9 +69,9 @@ pub(crate) fn render(document: &WaveDromDocument, theme: &Theme) -> RenderPlan {
             timing_height.max(74.0),
             width,
             theme,
-        );
+        )?;
     }
-    RenderPlan { scene, warnings }
+    Ok(RenderPlan { scene, warnings })
 }
 
 fn flatten_lanes<'a>(
@@ -384,7 +384,14 @@ fn draw_register(
     top: f32,
     width: f32,
     theme: &Theme,
-) {
+) -> Result<()> {
+    let total_bits = fields.iter().try_fold(0_u64, |total, field| {
+        total.checked_add(register_bits(field)).ok_or_else(|| {
+            RenderError::InvalidScene(
+                "WaveDrom register total bit width exceeds u64::MAX".to_owned(),
+            )
+        })
+    })?;
     push_text(
         scene,
         Point::new(34.0, top + 28.0),
@@ -394,21 +401,18 @@ fn draw_register(
         &theme.foreground,
         TextWeight::Bold,
     );
-    let total_bits = fields
-        .iter()
-        .map(|field| field.bits.unwrap_or(1))
-        .sum::<u64>()
-        .max(1);
     let available = width - 68.0;
+    let right_edge = width - 34.0;
     let mut x = 34.0;
     let y = top + 52.0;
     let mut high_bit = total_bits;
     for (index, field) in fields.iter().enumerate() {
-        let bits = field.bits.unwrap_or(1).max(1);
+        let bits = register_bits(field);
+        let remaining = (right_edge - x).max(0.0);
         let field_width = if index + 1 == fields.len() {
-            34.0 + available - x
+            remaining
         } else {
-            available * bits as f32 / total_bits as f32
+            (available * (bits as f32 / total_bits as f32)).min(remaining)
         };
         scene.push(Primitive::Rect {
             rect: Rect::new(x, y, field_width, 54.0),
@@ -426,7 +430,7 @@ fn draw_register(
             &theme.foreground,
             TextWeight::Bold,
         );
-        let low_bit = high_bit.saturating_sub(bits);
+        let low_bit = high_bit - bits;
         let range = if bits == 1 {
             low_bit.to_string()
         } else {
@@ -442,8 +446,14 @@ fn draw_register(
             TextWeight::Normal,
         );
         high_bit = low_bit;
-        x += field_width;
+        x = (x + field_width).min(right_edge);
     }
+    Ok(())
+}
+
+fn register_bits(field: &WaveRegisterField) -> u64 {
+    // Missing and zero widths have always occupied one displayed bit.
+    field.bits.unwrap_or(1).max(1)
 }
 
 fn draw_arrowhead(scene: &mut Scene, tip: Point, previous: Point, color: &str) {

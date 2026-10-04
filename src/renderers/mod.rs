@@ -9,21 +9,21 @@ mod wavedrom;
 
 use diagram_ast_parser::ast::Document;
 
-use crate::{Scene, Theme};
+use crate::{Result, Scene, Theme};
 
 pub(crate) struct RenderPlan {
     pub scene: Scene,
     pub warnings: Vec<String>,
 }
 
-pub(crate) fn render(document: &Document, theme: &Theme) -> RenderPlan {
-    match document {
+pub(crate) fn render(document: &Document, theme: &Theme) -> Result<RenderPlan> {
+    Ok(match document {
         Document::Dbml(document) => dbml::render(document, theme),
-        Document::WaveDrom(document) => wavedrom::render(document, theme),
+        Document::WaveDrom(document) => wavedrom::render(document, theme)?,
         Document::D2(document) => d2::render(document, theme),
         Document::Structurizr(document) => structurizr::render(document, theme),
         Document::LikeC4(document) => likec4::render(document, theme),
         Document::Nomnoml(document) => nomnoml::render(document, theme),
         Document::Pikchr(document) => pikchr::render(document, theme),
-    }
+    })
 }

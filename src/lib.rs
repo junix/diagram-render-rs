@@ -72,7 +72,7 @@ pub fn render_document(
     options: &RenderOptions,
 ) -> Result<Rendered> {
     validate_options(options)?;
-    let plan = renderers::render(document, &options.theme);
+    let plan = renderers::render(document, &options.theme)?;
     plan.scene.validate().map_err(RenderError::InvalidScene)?;
     let svg = svg::scene_to_svg(
         &plan.scene,
