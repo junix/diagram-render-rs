@@ -22,7 +22,7 @@ pub(crate) fn scene_to_svg(scene: &Scene, background: Option<&str>, font_family:
     if let Some(color) = background {
         let _ = write!(
             svg,
-            r#"<rect data-canvas-background="true" x="0" y="0" width="{:.2}" height="{:.2}" fill="{}"/>"#,
+            r#"<rect data-canvas-background="author" x="0" y="0" width="{:.2}" height="{:.2}" fill="{}"/>"#,
             scene.width,
             scene.height,
             escape_attr(color)

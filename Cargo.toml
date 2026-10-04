@@ -31,6 +31,9 @@ thiserror = "2"
 unicode-width = "0.2"
 
 [dev-dependencies]
+# Exercise the shared output gate against real SVG/PNG without adding its
+# parsers to production builds. Keep the same revision as the runtime palette.
+diagram-theme = { git = "https://github.com/junix/diagram-theme-rs.git", rev = "0d6530f0ccea5a61b0d2fef9a3e164ff816ca852", features = ["cli"] }
 
 [profile.release]
 lto = "thin"

@@ -90,6 +90,15 @@ the only way to fill one. Choosing a `-dark` theme asserts that the host page is
 dark; the file itself does not adapt, and the knock-outs it draws inherit that
 assertion.
 
+An explicit `--background` is emitted as a full-canvas rectangle marked
+`data-canvas-background="author"`. The shared output gate recognizes that
+author-requested canvas in both the SVG and its paired PNG; with no background
+option, neither a canvas rectangle nor an exemption is emitted.
+`cargo test --test canvas_contract` renders real SVG/PNG pairs in all fourteen
+canonical themes and runs the pinned shared gate over them. This focused check
+does not require an installed `diagram-theme` executable; the broader
+`just check-themes` command remains a separate gallery check.
+
 If a pipeline already has the serialized parser AST, skip source parsing:
 
 ```console

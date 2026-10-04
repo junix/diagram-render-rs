@@ -150,7 +150,7 @@ fn explicit_background_is_emitted() {
     };
     let rendered =
         render_source(DiagramFormat::D2, "a -> b", OutputFormat::Svg, &options).expect("render");
-    assert!(rendered.svg.contains("data-canvas-background=\"true\""));
+    assert!(rendered.svg.contains("data-canvas-background=\"author\""));
 }
 
 #[test]
