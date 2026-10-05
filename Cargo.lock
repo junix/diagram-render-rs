@@ -196,7 +196,7 @@ checksum = "be1e0bca6c3637f992fc1cc7cbc52a78c1ef6db076dbf1059c4323d6a2048376"
 [[package]]
 name = "diagram-ast-parser"
 version = "0.1.0"
-source = "git+https://github.com/junix/diagram-ast-parser.git?rev=a8540652364157838d8c6398f08d9abfb4efcb93#a8540652364157838d8c6398f08d9abfb4efcb93"
+source = "git+https://github.com/junix/diagram-ast-parser.git?rev=1bb33fbd22b6a51580021a157f30e1484221f0f5#1bb33fbd22b6a51580021a157f30e1484221f0f5"
 dependencies = [
  "clap",
  "serde",

@@ -20,7 +20,7 @@ path = "src/main.rs"
 
 [dependencies]
 clap = { version = "=4.6.6", features = ["derive"] }
-diagram-ast-parser = { git = "https://github.com/junix/diagram-ast-parser.git", rev = "a8540652364157838d8c6398f08d9abfb4efcb93" }
+diagram-ast-parser = { git = "https://github.com/junix/diagram-ast-parser.git", rev = "1bb33fbd22b6a51580021a157f30e1484221f0f5" }
 # The 24-token palette contract shared by the five renderers (ADR-1137). The
 # `clap` feature is only the `--theme` value parser; the tables carry no
 # runtime dependencies.
