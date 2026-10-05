@@ -145,7 +145,36 @@ pub(crate) fn render(document: &DbmlDocument, theme: &Theme) -> RenderPlan {
 
     RenderPlan {
         scene: super::cards::render(&mut diagram, theme),
-        warnings: Vec::new(),
+        warnings: inline_reference_warnings(document),
+    }
+}
+
+// Count authored settings, not missing edges: partials may be unused or reused,
+// and the same relationship may also have an explicit Ref declaration.
+fn inline_reference_warnings(document: &DbmlDocument) -> Vec<String> {
+    let count = document
+        .items
+        .iter()
+        .filter_map(|item| match &item.node {
+            DbmlItem::Table(table) => Some(&table.items),
+            DbmlItem::TablePartial(partial) => Some(&partial.items),
+            _ => None,
+        })
+        .flatten()
+        .filter_map(|item| match &item.node {
+            DbmlTableItem::Column(column) => Some(&column.settings),
+            _ => None,
+        })
+        .flatten()
+        .filter(|setting| setting.name.eq_ignore_ascii_case("ref"))
+        .count();
+    if count == 0 {
+        Vec::new()
+    } else {
+        vec![format!(
+            "DBML contains {count} inline column ref setting(s) in tables/partials; \
+             these settings are not rendered as connectors. Use explicit Ref declarations for connectors."
+        )]
     }
 }
 

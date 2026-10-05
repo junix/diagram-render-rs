@@ -81,6 +81,10 @@ struct Cli {
     #[arg(long)]
     width: Option<u32>,
 
+    /// Refuse output if rendering reports any warning (even with --quiet).
+    #[arg(long)]
+    deny_warnings: bool,
+
     /// Suppress output summaries and non-fatal renderer warnings.
     #[arg(short, long)]
     quiet: bool,
@@ -140,6 +144,16 @@ fn run(cli: Cli) -> std::result::Result<(), String> {
         render_source(cli.format, &input, output_format, &options)
     }
     .map_err(|error| error.to_string())?;
+
+    // Check before stdout, file creation, directory creation, or replacement.
+    // Quiet controls diagnostics for successful renders, not this fatal policy.
+    if cli.deny_warnings && !rendered.warnings.is_empty() {
+        return Err(format!(
+            "--deny-warnings refused output: {} renderer warning(s):\n{}",
+            rendered.warnings.len(),
+            rendered.warnings.join("\n")
+        ));
+    }
 
     let bytes = match output_format {
         OutputFormat::Svg => rendered.svg.as_bytes(),

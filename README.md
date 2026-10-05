@@ -33,7 +33,7 @@ domain objects.
 
 | AST family | Current rendering |
 |---|---|
-| DBML | project title, tables/columns/settings, enums, partials, groups, notes, references and cardinality labels |
+| DBML | project title, tables/columns/settings, enums, partials, groups, notes, explicit Ref declarations and cardinality labels; inline column refs produce a warning |
 | WaveDrom | nested signal lanes, 0/1/clock/bus/unknown/high-Z cells, data labels, node edges, header/footer, register bit fields |
 | D2 | entries/maps, labels/properties, directed/reverse/undirected/bidirectional edge chains |
 | Structurizr DSL | workspace/model elements, nesting hints, technology/description, relationships; view syntax is reported but not evaluated |
@@ -45,7 +45,17 @@ The renderer is intentionally syntax-AST-driven. It does not load imports,
 resolve cross-file names, evaluate Structurizr/LikeC4 views, expand Pikchr
 macros, or claim upstream-renderer pixel parity. Non-fatal degradations are
 returned in `Rendered::warnings` and printed by the CLI unless `--quiet` is
-used.
+used. DBML inline column `[ref: ...]` settings in tables and table partials
+are counted in one aggregate warning because they are not rendered as
+connectors; use explicit `Ref` declarations for connectors. This counts authored
+settings, not missing edges or partial expansions.
+
+Use `--deny-warnings` to fail before writing stdout or creating/replacing an
+output file whenever the renderer reports a warning. This also applies with
+`--quiet`, and covers warnings from every diagram family. It denies reported
+warnings only: it is not complete unsupported-semantics validation or an OS
+sandbox. The library continues to return `Rendered::warnings` for callers to
+handle. See [warning-policy verification](docs/verification/renderer-warnings.md).
 
 ## CLI
 
