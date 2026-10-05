@@ -1,0 +1,173 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "dbml.authored/v1"
+      ]
+    },
+    "tables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,11}$",
+            "minLength": 1,
+            "maxLength": 12,
+            "not": {
+              "pattern": "[^A-Za-z0-9_]"
+            }
+          },
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,11}$",
+                  "minLength": 1,
+                  "maxLength": 12,
+                  "not": {
+                    "pattern": "[^A-Za-z0-9_]"
+                  }
+                },
+                "data_type": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]{0,11}$",
+                  "minLength": 1,
+                  "maxLength": 12,
+                  "not": {
+                    "pattern": "[^A-Za-z0-9_]"
+                  }
+                },
+                "flags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "pk",
+                      "unique",
+                      "not null"
+                    ]
+                  },
+                  "minItems": 0,
+                  "maxItems": 3,
+                  "uniqueItems": true
+                }
+              },
+              "required": [
+                "name",
+                "data_type",
+                "flags"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1,
+            "maxItems": 16
+          }
+        },
+        "required": [
+          "name",
+          "columns"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 2
+    },
+    "refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "object",
+            "properties": {
+              "table": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,11}$",
+                "minLength": 1,
+                "maxLength": 12,
+                "not": {
+                  "pattern": "[^A-Za-z0-9_]"
+                }
+              },
+              "column": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,11}$",
+                "minLength": 1,
+                "maxLength": 12,
+                "not": {
+                  "pattern": "[^A-Za-z0-9_]"
+                }
+              }
+            },
+            "required": [
+              "table",
+              "column"
+            ],
+            "additionalProperties": false
+          },
+          "to": {
+            "type": "object",
+            "properties": {
+              "table": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,11}$",
+                "minLength": 1,
+                "maxLength": 12,
+                "not": {
+                  "pattern": "[^A-Za-z0-9_]"
+                }
+              },
+              "column": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,11}$",
+                "minLength": 1,
+                "maxLength": 12,
+                "not": {
+                  "pattern": "[^A-Za-z0-9_]"
+                }
+              }
+            },
+            "required": [
+              "table",
+              "column"
+            ],
+            "additionalProperties": false
+          },
+          "cardinality": {
+            "type": "string",
+            "enum": [
+              "many-to-one",
+              "one-to-many",
+              "one-to-one",
+              "many-to-many"
+            ]
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "cardinality"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "tables",
+    "refs"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Closed authored DBML JSON subset v1",
+  "description": "Not DBML text or upstream AST JSON. Runtime additionally checks exact case-sensitive table/column identities, distinct reference tables and resolved endpoints, composed column labels <=18 display cells and reference labels <=11. Input <=65536 bytes, JSON depth <=16, value nodes <=2048. ASCII identifiers/types only."
+}

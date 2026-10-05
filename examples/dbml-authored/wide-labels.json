@@ -1,0 +1,43 @@
+{
+  "schema_version": "dbml.authored/v1",
+  "tables": [
+    {
+      "name": "WWWWWWWWWWWW",
+      "columns": [
+        {
+          "name": "WWWWWWWWWWWW",
+          "data_type": "WWWW",
+          "flags": []
+        },
+        {
+          "name": "WWW",
+          "data_type": "WWWWWWWWWWWW",
+          "flags": []
+        }
+      ]
+    },
+    {
+      "name": "MMMMMMMMMMMM",
+      "columns": [
+        {
+          "name": "WWW",
+          "data_type": "WWWWWWWWWWWW",
+          "flags": []
+        }
+      ]
+    }
+  ],
+  "refs": [
+    {
+      "from": {
+        "table": "MMMMMMMMMMMM",
+        "column": "WWW"
+      },
+      "to": {
+        "table": "WWWWWWWWWWWW",
+        "column": "WWW"
+      },
+      "cardinality": "many-to-many"
+    }
+  ]
+}

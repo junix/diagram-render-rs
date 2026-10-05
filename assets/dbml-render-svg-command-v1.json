@@ -1,0 +1,191 @@
+{
+  "name": "render-svg",
+  "capability_id": "diagram.dbml.render-svg-v1",
+  "title": "Render authored DBML JSON to SVG",
+  "description": "Render a bounded closed authored DBML JSON subset locally through native diagram-render-rs table cards. Mandatory byte pins and typed receipt; every native warning is fatal. Does not accept DBML source text or claim complete ER/database semantics.",
+  "primitive": "render",
+  "input_kinds": [
+    "json"
+  ],
+  "output_kinds": [
+    "svg",
+    "json"
+  ],
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "input": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "description": "Explicit regular file containing dbml.authored/v1 authored JSON; at most 64 KiB. No DBML text, imports or external resources.",
+        "x-acme-role": "input-file"
+      },
+      "resource_pins": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "minLength": 64,
+            "maxLength": 64,
+            "description": "Exact raw input byte SHA-256."
+          }
+        },
+        "required": [
+          "input"
+        ],
+        "additionalProperties": false,
+        "description": "Exactly the provided input role hash in a closed duplicate-free object of at most 4 KiB."
+      },
+      "output": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "description": "Explicit SVG output destination; at most 256 KiB.",
+        "x-acme-role": "output-file"
+      },
+      "receipt": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "description": "Mandatory path-free dbml.render-receipt/v1 JSON; at most 16 KiB.",
+        "x-acme-role": "output-file",
+        "x-acme-receipt-core": {
+          "schema_version": "plot.artifact-receipt-core/v1",
+          "primary_argument": "output",
+          "artifact_id": "figure",
+          "role": "primary"
+        }
+      },
+      "theme": {
+        "type": "string",
+        "enum": [
+          "light",
+          "dark",
+          "azure",
+          "azure-dark",
+          "mist-blue",
+          "mist-blue-dark",
+          "sage",
+          "sage-dark",
+          "stone-teal",
+          "stone-teal-dark",
+          "dusty-violet",
+          "dusty-violet-dark",
+          "warm-sand",
+          "warm-sand-dark",
+          "olive-paper",
+          "olive-paper-dark"
+        ],
+        "default": "light",
+        "description": "Native canonical or legacy palette; default light."
+      },
+      "background": {
+        "type": "string",
+        "pattern": "^#[0-9A-Fa-f]{6}$",
+        "minLength": 7,
+        "maxLength": 7,
+        "description": "Optional literal #RRGGBB canvas. Omit for transparency."
+      }
+    },
+    "required": [
+      "input",
+      "resource_pins",
+      "output",
+      "receipt"
+    ],
+    "additionalProperties": false
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "path": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Locate the primary SVG artifact published by the Hub."
+      },
+      "kind": {
+        "type": "string",
+        "enum": [
+          "svg"
+        ],
+        "description": "Identify the verified primary SVG artifact encoding."
+      }
+    },
+    "required": [
+      "path",
+      "kind"
+    ],
+    "additionalProperties": false
+  },
+  "suggested_command_path": [
+    "diagram",
+    "dbml",
+    "render-svg-v1"
+  ],
+  "side_effects": {
+    "reads_files": true,
+    "writes_files": true,
+    "creates_artifacts": true,
+    "network": false,
+    "data_egress": false,
+    "downloads_models": false,
+    "uses_gpu": false,
+    "mutates_index": false,
+    "opens_viewer": false
+  },
+  "availability": {
+    "available": true
+  },
+  "determinism": {
+    "level": "environment-dependent",
+    "notes": "SVG bytes replay for the same provider build, input bytes and options. Native layout uses display-width estimates. Viewer-resolved fonts; no pinned-font, measured-text, cross-build or cross-machine pixel parity."
+  },
+  "cli_spec": {
+    "subcommand": [
+      "render-svg"
+    ],
+    "positionals": [],
+    "flags": [
+      {
+        "name": "input",
+        "flag": "--input",
+        "kind": "string",
+        "order": 10
+      },
+      {
+        "name": "resource_pins",
+        "flag": "--resource-pins",
+        "kind": "json",
+        "order": 20
+      },
+      {
+        "name": "output",
+        "flag": "--output",
+        "kind": "string",
+        "order": 30
+      },
+      {
+        "name": "receipt",
+        "flag": "--receipt",
+        "kind": "string",
+        "order": 40
+      },
+      {
+        "name": "theme",
+        "flag": "--theme",
+        "kind": "string",
+        "order": 50,
+        "optional": true
+      },
+      {
+        "name": "background",
+        "flag": "--background",
+        "kind": "string",
+        "order": 60,
+        "optional": true
+      }
+    ]
+  }
+}

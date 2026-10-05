@@ -1,0 +1,11 @@
+// Independent native CLI parity oracle for users-posts.json.
+Table users {
+  id int [pk]
+  name text
+}
+Table posts {
+  id int [not null]
+  uid int
+  title text
+}
+Ref: posts.uid > users.id

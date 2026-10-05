@@ -1,5 +1,6 @@
 [package]
 name = "diagram-render-rs"
+default-run = "diagram-render-rs"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.85"
@@ -18,7 +19,17 @@ path = "src/lib.rs"
 name = "diagram-render-rs"
 path = "src/main.rs"
 
+[[bin]]
+name = "plot-provider-dbml"
+path = "src/bin/dbml/main.rs"
+
 [dependencies]
+anyhow = "=1.0.86"
+serde = { version = "=1.0.229", features = ["derive"] }
+sha2 = "=0.10.9"
+tempfile = "=3.27.0"
+libc = "=0.2.189"
+same-file = "=1.0.6"
 clap = { version = "=4.6.6", features = ["derive"] }
 diagram-ast-parser = { git = "https://github.com/junix/diagram-ast-parser.git", rev = "1bb33fbd22b6a51580021a157f30e1484221f0f5" }
 # The 24-token palette contract shared by the five renderers (ADR-1137). The

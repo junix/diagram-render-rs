@@ -1,0 +1,57 @@
+{
+  "schema_version": "dbml.authored/v1",
+  "tables": [
+    {
+      "name": "users",
+      "columns": [
+        {
+          "name": "id",
+          "data_type": "int",
+          "flags": [
+            "pk"
+          ]
+        },
+        {
+          "name": "name",
+          "data_type": "text",
+          "flags": []
+        }
+      ]
+    },
+    {
+      "name": "posts",
+      "columns": [
+        {
+          "name": "id",
+          "data_type": "int",
+          "flags": [
+            "not null"
+          ]
+        },
+        {
+          "name": "uid",
+          "data_type": "int",
+          "flags": []
+        },
+        {
+          "name": "title",
+          "data_type": "text",
+          "flags": []
+        }
+      ]
+    }
+  ],
+  "refs": [
+    {
+      "from": {
+        "table": "posts",
+        "column": "uid"
+      },
+      "to": {
+        "table": "users",
+        "column": "id"
+      },
+      "cardinality": "many-to-one"
+    }
+  ]
+}

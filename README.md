@@ -122,6 +122,15 @@ diagram-render-rs document.ast.json --ast-json -o document.svg
 Run `diagram-render-rs --help` for all options, including font-family override,
 exact PNG width, stdin/stdout, and explicit `-T svg|png`.
 
+## Closed authored DBML provider
+
+`plot-provider-dbml` adds `diagram.dbml.render-svg-v1` for a bounded authored
+DBML JSON subset: 1–2 tables, explicit columns and at most one relationship.
+It calls the native renderer, requires exact input byte pins, refuses native
+warnings, and publishes SVG plus a typed path-free receipt with paired rollback.
+This profile does not accept general DBML text or promise complete ER/database
+semantics. See the [contract and validation](docs/plot-dbml-provider.md).
+
 ## Library
 
 Render source text through the convenience boundary:

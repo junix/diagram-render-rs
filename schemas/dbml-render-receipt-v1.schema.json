@@ -1,0 +1,382 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "dbml.render-receipt/v1"
+      ]
+    },
+    "profile": {
+      "type": "string",
+      "enum": [
+        "dbml-authored-svg/1"
+      ]
+    },
+    "provider": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "enum": [
+            "plot-provider-dbml"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "engine": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "enum": [
+            "diagram-render-rs"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "enum": [
+            "0.1.0"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "dependency_revisions": {
+      "type": "object",
+      "properties": {
+        "renderer_code": {
+          "type": "string",
+          "enum": [
+            "8203dbe909d588ad0239f0bd77f9b439f48111e5"
+          ]
+        },
+        "parser": {
+          "type": "string",
+          "enum": [
+            "1bb33fbd22b6a51580021a157f30e1484221f0f5"
+          ]
+        },
+        "theme": {
+          "type": "string",
+          "enum": [
+            "0d6530f0ccea5a61b0d2fef9a3e164ff816ca852"
+          ]
+        }
+      },
+      "required": [
+        "renderer_code",
+        "parser",
+        "theme"
+      ],
+      "additionalProperties": false
+    },
+    "artifact_receipt": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "enum": [
+            "plot.artifact-receipt-core/v1"
+          ]
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "role": {
+                "type": "string",
+                "enum": [
+                  "input"
+                ]
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+                "minLength": 64,
+                "maxLength": 64
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65536
+              }
+            },
+            "required": [
+              "role",
+              "sha256",
+              "bytes"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "primary": {
+          "type": "object",
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "enum": [
+                "figure"
+              ]
+            },
+            "role": {
+              "type": "string",
+              "enum": [
+                "primary"
+              ]
+            },
+            "argument": {
+              "type": "string",
+              "enum": [
+                "output"
+              ]
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "svg"
+              ]
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "minLength": 64,
+              "maxLength": 64
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 262144
+            }
+          },
+          "required": [
+            "artifact_id",
+            "role",
+            "argument",
+            "kind",
+            "sha256",
+            "bytes"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "inputs",
+        "primary"
+      ],
+      "additionalProperties": false
+    },
+    "counts": {
+      "type": "object",
+      "properties": {
+        "tables": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2
+        },
+        "columns": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32
+        },
+        "refs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "tables",
+        "columns",
+        "refs"
+      ],
+      "additionalProperties": false
+    },
+    "canvas": {
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "width",
+        "height"
+      ],
+      "additionalProperties": false
+    },
+    "options": {
+      "type": "object",
+      "properties": {
+        "theme": {
+          "type": "string",
+          "enum": [
+            "light",
+            "dark",
+            "azure",
+            "azure-dark",
+            "mist-blue",
+            "mist-blue-dark",
+            "sage",
+            "sage-dark",
+            "stone-teal",
+            "stone-teal-dark",
+            "dusty-violet",
+            "dusty-violet-dark",
+            "warm-sand",
+            "warm-sand-dark",
+            "olive-paper",
+            "olive-paper-dark"
+          ]
+        },
+        "background": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$",
+              "minLength": 7,
+              "maxLength": 7
+            }
+          ]
+        },
+        "warning_policy": {
+          "type": "string",
+          "enum": [
+            "deny"
+          ]
+        }
+      },
+      "required": [
+        "theme",
+        "background",
+        "warning_policy"
+      ],
+      "additionalProperties": false
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "maxItems": 0
+    },
+    "fidelity": {
+      "type": "object",
+      "properties": {
+        "input_contract": {
+          "type": "string",
+          "enum": [
+            "closed-authored-dbml-json/v1"
+          ]
+        },
+        "layout": {
+          "type": "string",
+          "enum": [
+            "native-table-cards"
+          ]
+        },
+        "references": {
+          "type": "string",
+          "enum": [
+            "directed-table-card-connectors; cardinality-label-only; no-column-ports"
+          ]
+        },
+        "typography": {
+          "type": "string",
+          "enum": [
+            "native-font-family-viewer-resolved"
+          ]
+        },
+        "source_text_parsed": {
+          "type": "boolean",
+          "const": false
+        },
+        "source_spans_preserved": {
+          "type": "boolean",
+          "const": false
+        },
+        "database_semantics_validated": {
+          "type": "boolean",
+          "const": false
+        },
+        "fonts_embedded": {
+          "type": "boolean",
+          "const": false
+        },
+        "fonts_pinned": {
+          "type": "boolean",
+          "const": false
+        },
+        "measured_shaping_verified": {
+          "type": "boolean",
+          "const": false
+        },
+        "glyph_coverage_verified": {
+          "type": "boolean",
+          "const": false
+        },
+        "cross_machine_pixel_parity": {
+          "type": "boolean",
+          "const": false
+        }
+      },
+      "required": [
+        "input_contract",
+        "layout",
+        "references",
+        "typography",
+        "source_text_parsed",
+        "source_spans_preserved",
+        "database_semantics_validated",
+        "fonts_embedded",
+        "fonts_pinned",
+        "measured_shaping_verified",
+        "glyph_coverage_verified",
+        "cross_machine_pixel_parity"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "profile",
+    "provider",
+    "engine",
+    "dependency_revisions",
+    "artifact_receipt",
+    "counts",
+    "canvas",
+    "options",
+    "warnings",
+    "fidelity"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DBML authored SVG render receipt v1"
+}
