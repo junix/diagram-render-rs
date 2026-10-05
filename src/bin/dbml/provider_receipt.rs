@@ -98,7 +98,7 @@ struct Receipt {
 pub(crate) fn build(
     input: InputReceipt,
     counts: Counts,
-    rendered: &diagram_render_rs::Rendered,
+    rendered: &diagram_render_v1::Rendered,
     theme: &str,
     background: Option<String>,
 ) -> Result<Vec<u8>> {
@@ -111,7 +111,7 @@ pub(crate) fn build(
         },
         engine: Component {
             id: "diagram-render-rs".into(),
-            version: diagram_render_rs::VERSION.into(),
+            version: diagram_render_v1::VERSION.into(),
         },
         dependency_revisions: Revisions {
             renderer_code: super::RENDERER_REVISION.into(),

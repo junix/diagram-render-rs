@@ -129,7 +129,9 @@ DBML JSON subset: 1–2 tables, explicit columns and at most one relationship.
 It calls the native renderer, requires exact input byte pins, refuses native
 warnings, and publishes SVG plus a typed path-free receipt with paired rollback.
 This profile does not accept general DBML text or promise complete ER/database
-semantics. See the [contract and validation](docs/plot-dbml-provider.md).
+semantics. V1 links the complete renderer library at its exact receipt-pinned
+Git revision; current native CLI routing evolves independently. See the
+[contract and validation](docs/plot-dbml-provider.md).
 
 ## Library
 
@@ -203,3 +205,32 @@ the project remains an independently reproducible repository.
 ## License
 
 MIT; see [LICENSE](LICENSE).
+
+### Card connector routing
+
+DBML, D2, LikeC4, nomnoml, and Structurizr card views retain their existing
+connector geometry when the path and its label are clear. Obstructed routes use
+a deterministic orthogonal visibility-grid repair, with boundary ports and
+clearance around cards, shadows, the title, and other connector labels. Repeated
+and reversed endpoint pairs receive distinct ports. Label pills remain on their own
+connector and cannot hide unrelated routes or arrowheads. Self-loops stay clear of the title.
+
+Routing is intentionally bounded: at most 256 cards when connectors exist,
+1,024 connectors, 16,384 visibility-grid nodes, 256 vertices per route, and
+2,000,000 geometry/search work units per connector (12,000,000 per diagram).
+Repairs support up to eight distinct ports per endpoint pair. If a clear route
+or label slot cannot be found within these bounds, rendering returns an explicit
+`invalid scene` error naming the connector; it does not publish a hidden edge
+or silently discard a label. CLI failures preserve existing output files and
+emit no SVG/PNG bytes. Diagrams without connectors do not inherit the routing
+card limit. Card labels retain the existing display-width truncation policy. Text widths
+remain approximate: pill containment is not a glyph-extent guarantee for every
+font or unusually wide glyph sequence. No font measurement behavior changes
+in this routing repair.
+
+The repair is a bounded heuristic, not a complete orthogonal-layout solver.
+It tries fixed cardinal port pairs and shortest paths with several clearance
+choices. A no-route/no-label error means this search found no safe result; a
+longer route may still exist. In particular, a wide self-loop following another
+wide connector can exhaust the searched label/port choices. Rendering fails
+closed in those cases instead of obscuring a card or another connector.

@@ -3,9 +3,9 @@ use diagram_ast_parser::ast::d2::{D2Document, D2EdgeOperator, D2Statement, D2Val
 
 use super::RenderPlan;
 use super::cards::{Card, CardDiagram, Connector, ConnectorKind};
-use crate::Theme;
+use crate::{Result, Theme};
 
-pub(crate) fn render(document: &D2Document, theme: &Theme) -> RenderPlan {
+pub(crate) fn render(document: &D2Document, theme: &Theme) -> Result<RenderPlan> {
     let mut diagram = CardDiagram::new("D2 diagram");
     let mut warnings = Vec::new();
     walk(&document.statements, "", None, &mut diagram, &mut warnings);
@@ -18,10 +18,10 @@ pub(crate) fn render(document: &D2Document, theme: &Theme) -> RenderPlan {
     for endpoint in endpoints {
         diagram.ensure_endpoint(&endpoint);
     }
-    RenderPlan {
-        scene: super::cards::render(&mut diagram, theme),
+    Ok(RenderPlan {
+        scene: super::cards::render(&mut diagram, theme)?,
         warnings,
-    }
+    })
 }
 
 fn walk(

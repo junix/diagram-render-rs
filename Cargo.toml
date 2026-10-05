@@ -24,6 +24,9 @@ name = "plot-provider-dbml"
 path = "src/bin/dbml/main.rs"
 
 [dependencies]
+# V1 receipts pin this exact implementation. Keep it independent of evolving
+# native CLI/library routing; never retarget the alias without a new contract.
+diagram-render-v1 = { package = "diagram-render-rs", git = "https://github.com/junix/diagram-render-rs.git", rev = "8203dbe909d588ad0239f0bd77f9b439f48111e5" }
 anyhow = "=1.0.86"
 serde = { version = "=1.0.229", features = ["derive"] }
 sha2 = "=0.10.9"

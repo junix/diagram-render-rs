@@ -1,9 +1,12 @@
 # Native authored DBML JSON provider
 
 `plot-provider-dbml` exposes `diagram.dbml.render-svg-v1`: a deliberately small,
-closed **authored DBML JSON subset**, passed to the real `render_document` API.
+closed **authored DBML JSON subset**, passed to the real `render_document` API
+of the complete native library pinned at revision
+`8203dbe909d588ad0239f0bd77f9b439f48111e5` (`diagram-render-v1` dependency alias).
 It does not accept general DBML source text or upstream serialized `Document`.
-Existing `diagram-render-rs` library and CLI routes keep their original behavior.
+The current `diagram-render-rs` library and CLI evolve separately; V1 preserves
+its pinned rendering implementation and output contract.
 
 ## Invocation
 
@@ -107,10 +110,22 @@ The mandatory closed typed
   fail-closed warning policy and actual native warning vector
 - Explicit fidelity limitations; no generated or caller filesystem paths
 
-The `renderer_code` revision identifies the unchanged native library source
-used here, not the later provider commit. Parser identity describes the linked
-AST model dependency, not a source-parse event. Maintainers must update this
-provenance and parity evidence when native renderer/dependency code changes.
+The `renderer_code` revision identifies the complete immutable native library
+actually linked for V1 through the exact Git-pinned `diagram-render-v1` alias.
+It does not identify the current library, whole provider executable, or later
+provider commit. V1 renderer types, rendering functions, theme handling and
+engine version all come from that pinned library. The executable must still be
+bound separately by consumers to its actual binary identity. Parser identity
+describes the linked AST model dependency, not a source-parse event.
+
+Do not retarget this dependency or silently change the V1 receipt constant.
+A new rendering implementation needs a separately versioned provider contract
+and receipt. An offline Cargo provenance test checks the exact package source
+and lock revision; typed AST/theme calls also require matching dependency source
+identities. Runtime tests cover every admitted pair of 1–16-column heights and
+all four cardinalities against the pinned library, plus an asymmetric-height
+canary where the evolving native CLI deliberately differs while V1 stays legacy.
+No V1 descriptor, schema, profile, or receipt identity is loosened.
 
 IO, path checks and pair staging follow the established Graph IR provider:
 input raw hash/bytes, file identity and bundle directory are rechecked before

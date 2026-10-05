@@ -60,3 +60,25 @@ It does not establish general DBML-text acceptance, full database semantics,
 column-port/crow's-foot ER rendering, complete unsupported-feature detection,
 remote CI, cross-platform pixels, or a crash-atomic two-file transaction.
 Hub admission and its compiled CLI/MCP transports are a separate consumer gate.
+
+## Pinned V1 compatibility during card-routing changes
+
+The obstacle-routing update keeps V1 on the complete native renderer library
+at exact Git revision `8203dbe909d588ad0239f0bd77f9b439f48111e5`, via the
+`diagram-render-v1` dependency alias. All 85 baseline files were verified against
+the recorded Git blobs; independent reconstruction produced the exact source
+tree `9aaf1a0024a122f3fe10f446d0d7debc9d65cbc3`. Cargo resolves separate old/new
+renderer package source identities and one shared pinned parser/theme identity,
+without a dependency cycle. Offline source replacement is only a local build
+setup; the committed dependency remains an exact Git pin, never a local path.
+
+V1 render functions/types, warning validation, CLI theme handling and engine
+version all use the old library. Its descriptor, authored schema, receipt schema,
+profile and revision constants remain byte-identical. Provider/source identity
+is distinct from the new executable's identity.
+
+New tests cover exact Cargo provenance, every 1–16-column height pair across
+four cardinalities (1,024 provider executions), and an accepted asymmetric
+input across all sixteen palettes where current native output differs but V1
+remains byte-identical to the legacy library. This is an explicit compatibility
+boundary, not an assertion that the new router executes old source code.

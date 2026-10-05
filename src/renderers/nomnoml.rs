@@ -4,9 +4,9 @@ use diagram_ast_parser::ast::nomnoml::{
 
 use super::RenderPlan;
 use super::cards::{Card, CardDiagram, Connector, ConnectorKind};
-use crate::Theme;
+use crate::{Result, Theme};
 
-pub(crate) fn render(document: &NomnomlDocument, theme: &Theme) -> RenderPlan {
+pub(crate) fn render(document: &NomnomlDocument, theme: &Theme) -> Result<RenderPlan> {
     let mut diagram = CardDiagram::new("nomnoml classifier diagram");
     for statement in &document.statements {
         match &statement.node {
@@ -24,10 +24,10 @@ pub(crate) fn render(document: &NomnomlDocument, theme: &Theme) -> RenderPlan {
             }
         }
     }
-    RenderPlan {
-        scene: super::cards::render(&mut diagram, theme),
+    Ok(RenderPlan {
+        scene: super::cards::render(&mut diagram, theme)?,
         warnings: Vec::new(),
-    }
+    })
 }
 
 fn classifier_card(classifier: &NomnomlClassifier, color_slot: usize) -> Card {

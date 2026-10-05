@@ -3,9 +3,9 @@ use diagram_ast_parser::ast::structurizr::{StructurizrDocument, StructurizrState
 
 use super::RenderPlan;
 use super::cards::{Card, CardDiagram, Connector, ConnectorKind};
-use crate::Theme;
+use crate::{Result, Theme};
 
-pub(crate) fn render(document: &StructurizrDocument, theme: &Theme) -> RenderPlan {
+pub(crate) fn render(document: &StructurizrDocument, theme: &Theme) -> Result<RenderPlan> {
     let mut diagram = CardDiagram::new("Structurizr workspace");
     let mut warnings = Vec::new();
     walk(&document.statements, None, &mut diagram, &mut warnings);
@@ -17,10 +17,10 @@ pub(crate) fn render(document: &StructurizrDocument, theme: &Theme) -> RenderPla
     for endpoint in endpoints {
         diagram.ensure_endpoint(&endpoint);
     }
-    RenderPlan {
-        scene: super::cards::render(&mut diagram, theme),
+    Ok(RenderPlan {
+        scene: super::cards::render(&mut diagram, theme)?,
         warnings,
-    }
+    })
 }
 
 fn walk(

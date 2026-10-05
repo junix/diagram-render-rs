@@ -454,3 +454,164 @@ fn conservative_wide_glyph_boundaries_are_explicit_and_fail_closed() {
         serde_json::from_slice(&fs::read(directory.path().join("receipt.json")).unwrap()).unwrap();
     assert_eq!(receipt["counts"]["columns"], 32);
 }
+
+const LEGACY_RENDERER_REVISION: &str = "8203dbe909d588ad0239f0bd77f9b439f48111e5";
+
+#[test]
+fn v1_provenance_pins_the_complete_resolved_legacy_git_library() {
+    let output = Command::new(env!("CARGO"))
+        .args([
+            "metadata",
+            "--format-version",
+            "1",
+            "--locked",
+            "--offline",
+            "--no-deps",
+        ])
+        .current_dir(env!("CARGO_MANIFEST_DIR"))
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let metadata: Value = serde_json::from_slice(&output.stdout).unwrap();
+    let root = metadata["packages"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|package| package["source"].is_null())
+        .unwrap();
+    let dependency = root["dependencies"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|dependency| dependency["rename"] == "diagram-render-v1")
+        .unwrap();
+    assert_eq!(dependency["name"], "diagram-render-rs");
+    assert_eq!(
+        dependency["source"],
+        format!(
+            "git+https://github.com/junix/diagram-render-rs.git?rev={LEGACY_RENDERER_REVISION}"
+        )
+    );
+    let lock = include_str!("../Cargo.lock");
+    let expected = format!(
+        "source = \"git+https://github.com/junix/diagram-render-rs.git?rev={LEGACY_RENDERER_REVISION}#{LEGACY_RENDERER_REVISION}\""
+    );
+    let packages: Vec<_> = lock
+        .split("[[package]]")
+        .filter(|package| package.contains("name = \"diagram-render-rs\""))
+        .collect();
+    assert_eq!(packages.len(), 2);
+    assert_eq!(
+        packages
+            .iter()
+            .filter(|package| package.contains(&expected))
+            .count(),
+        1
+    );
+    // The direct AST dependency must stay source-identical to the old renderer;
+    // otherwise the typed Authored::native -> legacy render_document call fails to compile.
+    assert_eq!(diagram_render_v1::VERSION, "0.1.0");
+}
+
+fn height_case(left: usize, right: usize, cardinality: &str, operator: &str) -> (Vec<u8>, String) {
+    let columns =
+        |count: usize| {
+            (0..count).map(|i| json!({
+        "name": ((b'a' + i as u8) as char).to_string(), "data_type":"int", "flags":[]
+    })).collect::<Vec<_>>()
+        };
+    let value = json!({"schema_version":"dbml.authored/v1", "tables":[
+        {"name":"a","columns":columns(left)}, {"name":"b","columns":columns(right)}
+    ], "refs":[{"from":{"table":"a","column":"a"},"to":{"table":"b","column":"a"},"cardinality":cardinality}]});
+    let mut source = String::new();
+    for (name, count) in [("a", left), ("b", right)] {
+        source.push_str(&format!("Table {name} {{\n"));
+        for i in 0..count {
+            source.push_str(&format!("{} int\n", (b'a' + i as u8) as char));
+        }
+        source.push_str("}\n");
+    }
+    source.push_str(&format!("Ref: a.a {operator} b.a\n"));
+    (serde_json::to_vec(&value).unwrap(), source)
+}
+
+#[test]
+fn v1_keeps_legacy_svg_for_every_admitted_height_pair_and_cardinality() {
+    let dir = TempDir::new().unwrap();
+    for left in 1..=16 {
+        for right in 1..=16 {
+            for (cardinality, operator) in [
+                ("many-to-one", ">"),
+                ("one-to-many", "<"),
+                ("one-to-one", "-"),
+                ("many-to-many", "<>"),
+            ] {
+                let (input, source) = height_case(left, right, cardinality, operator);
+                let legacy = diagram_render_v1::render_source(
+                    diagram_render_v1::DiagramFormat::Dbml,
+                    &source,
+                    diagram_render_v1::OutputFormat::Svg,
+                    &diagram_render_v1::RenderOptions::default(),
+                )
+                .unwrap();
+                assert_eq!(
+                    checked(dir.path(), &input, &[]),
+                    legacy.svg.as_bytes(),
+                    "{left}/{right} {cardinality}"
+                );
+                let receipt: Value =
+                    serde_json::from_slice(&fs::read(dir.path().join("receipt.json")).unwrap())
+                        .unwrap();
+                assert_eq!(
+                    receipt["dependency_revisions"]["renderer_code"],
+                    LEGACY_RENDERER_REVISION
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn v1_deliberately_retains_legacy_layout_when_current_native_routing_changes() {
+    let dir = TempDir::new().unwrap();
+    let (input, source) = height_case(1, 16, "many-to-one", ">");
+    let source_path = dir.path().join("asymmetric.dbml");
+    fs::write(&source_path, &source).unwrap();
+    for name in std::iter::once("light")
+        .chain(std::iter::once("dark"))
+        .chain(diagram_theme::Theme::NAMES)
+    {
+        let legacy = diagram_render_v1::render_source(
+            diagram_render_v1::DiagramFormat::Dbml,
+            &source,
+            diagram_render_v1::OutputFormat::Svg,
+            &diagram_render_v1::RenderOptions {
+                theme: diagram_render_v1::Theme::resolved(
+                    diagram_theme::resolve(name, &["light", "dark"], "plot-provider-dbml").unwrap(),
+                ),
+                ..diagram_render_v1::RenderOptions::default()
+            },
+        )
+        .unwrap();
+        let provider = checked(dir.path(), &input, &["--theme", name]);
+        assert_eq!(provider, legacy.svg.as_bytes());
+        let current = Command::new(env!("CARGO_BIN_EXE_diagram-render-rs"))
+            .arg(&source_path)
+            .args(["-f", "dbml", "--theme", name, "--quiet"])
+            .output()
+            .unwrap();
+        assert!(
+            current.status.success(),
+            "{}",
+            String::from_utf8_lossy(&current.stderr)
+        );
+        assert_ne!(
+            provider, current.stdout,
+            "V1 must execute the frozen renderer, not current routing: {name}"
+        );
+    }
+}

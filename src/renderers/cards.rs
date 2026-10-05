@@ -8,7 +8,10 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use unicode_width::{UnicodeWidthChar as _, UnicodeWidthStr as _};
 
-use crate::Theme;
+use crate::{Result, Theme};
+
+#[path = "card_routes.rs"]
+mod routing;
 use crate::scene::{Point, Primitive, Rect, Scene, Stroke, TextAnchor, TextWeight};
 
 const CARD_WIDTH: f32 = 258.0;
@@ -106,7 +109,7 @@ impl CardDiagram {
     }
 }
 
-pub(crate) fn render(diagram: &mut CardDiagram, theme: &Theme) -> Scene {
+pub(crate) fn render(diagram: &mut CardDiagram, theme: &Theme) -> Result<Scene> {
     deduplicate_cards(diagram);
     if diagram.cards.is_empty() {
         diagram.cards.push(Card::new(
@@ -179,13 +182,13 @@ pub(crate) fn render(diagram: &mut CardDiagram, theme: &Theme) -> Scene {
         row_y += row_height + Y_GAP;
     }
 
-    draw_connectors(&mut scene, &diagram.connectors, &positions, theme);
+    draw_connectors(&mut scene, &diagram.connectors, &positions, theme)?;
     for (index, card) in diagram.cards.iter().enumerate() {
         if let Some(rect) = positions.get(&card.id).copied() {
             draw_card(&mut scene, card, rect, &wrapped[index], theme);
         }
     }
-    scene
+    Ok(scene)
 }
 
 fn deduplicate_cards(diagram: &mut CardDiagram) {
@@ -198,8 +201,9 @@ fn draw_connectors(
     connectors: &[Connector],
     positions: &BTreeMap<String, Rect>,
     theme: &Theme,
-) {
-    for connector in connectors {
+) -> Result<()> {
+    let mut router = routing::Router::new(positions, scene.width, scene.height, connectors.len())?;
+    for (index, connector) in connectors.iter().enumerate() {
         let (Some(from_rect), Some(to_rect)) = (
             positions.get(&connector.from).copied(),
             positions.get(&connector.to).copied(),
@@ -219,7 +223,9 @@ fn draw_connectors(
         let label_width = label.as_deref().map_or(0.0, |label| {
             (label.width() as f32 * 7.1 + 18.0).clamp(46.0, 250.0)
         });
-        let points = connector_points(from_rect, to_rect, label_width);
+        let legacy = connector_points(from_rect, to_rect, label_width);
+        let (points, label_center) =
+            router.route(index, connector, from_rect, to_rect, label_width, legacy)?;
         scene.push(Primitive::Polyline {
             points: points.clone(),
             stroke,
@@ -245,7 +251,7 @@ fn draw_connectors(
             draw_arrowhead(scene, start, start_neighbor, &theme.line);
         }
         if let Some(label) = label {
-            let middle = polyline_middle(&points);
+            let middle = label_center.expect("a labeled route has a checked label center");
             scene.push(Primitive::Rect {
                 rect: Rect::new(
                     middle.x - label_width / 2.0,
@@ -269,6 +275,7 @@ fn draw_connectors(
             );
         }
     }
+    Ok(())
 }
 
 fn draw_card(scene: &mut Scene, card: &Card, rect: Rect, lines: &[String], theme: &Theme) {

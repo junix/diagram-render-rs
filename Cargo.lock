@@ -245,6 +245,7 @@ dependencies = [
  "anyhow",
  "clap",
  "diagram-ast-parser",
+ "diagram-render-rs 0.1.0 (git+https://github.com/junix/diagram-render-rs.git?rev=8203dbe909d588ad0239f0bd77f9b439f48111e5)",
  "diagram-theme",
  "libc",
  "resvg",
@@ -253,6 +254,20 @@ dependencies = [
  "serde_json",
  "sha2",
  "tempfile",
+ "thiserror",
+ "unicode-width",
+]
+
+[[package]]
+name = "diagram-render-rs"
+version = "0.1.0"
+source = "git+https://github.com/junix/diagram-render-rs.git?rev=8203dbe909d588ad0239f0bd77f9b439f48111e5#8203dbe909d588ad0239f0bd77f9b439f48111e5"
+dependencies = [
+ "clap",
+ "diagram-ast-parser",
+ "diagram-theme",
+ "resvg",
+ "serde_json",
  "thiserror",
  "unicode-width",
 ]

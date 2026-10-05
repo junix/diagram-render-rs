@@ -5,7 +5,7 @@ use super::{
 };
 use anyhow::{Result, ensure};
 use clap::Args;
-use diagram_render_rs::{OutputFormat, RenderOptions, Theme, render_document};
+use diagram_render_v1::{OutputFormat, RenderOptions, Theme, render_document};
 use diagram_theme::{Resolved, cli::theme_value_parser};
 use std::path::PathBuf;
 
@@ -20,7 +20,7 @@ pub(crate) struct Options {
     output: PathBuf,
     #[arg(long)]
     receipt: PathBuf,
-    #[arg(long, default_value="light", value_parser=theme_value_parser(diagram_render_rs::theme::LEGACY,"plot-provider-dbml"))]
+    #[arg(long, default_value="light", value_parser=theme_value_parser(diagram_render_v1::theme::LEGACY,"plot-provider-dbml"))]
     theme: Resolved,
     /// Optional literal #RRGGBB canvas color. Omit for transparency.
     #[arg(long)]
@@ -84,7 +84,7 @@ pub(crate) fn run(options: Options) -> Result<()> {
     input.recheck(&options.output, &options.receipt)?;
     publish(vec![svg_stage, receipt_stage])
 }
-fn validate_rendered(rendered: &diagram_render_rs::Rendered) -> Result<()> {
+fn validate_rendered(rendered: &diagram_render_v1::Rendered) -> Result<()> {
     ensure!(
         rendered.warnings.is_empty(),
         "DBML provider refuses {} native warning(s)",
@@ -108,8 +108,8 @@ mod tests {
     use super::*;
     #[test]
     fn actual_native_warnings_fail_closed() {
-        let warning = diagram_render_rs::render_source(
-            diagram_render_rs::DiagramFormat::Dbml,
+        let warning = diagram_render_v1::render_source(
+            diagram_render_v1::DiagramFormat::Dbml,
             "Table x { id int [ref: > y.id] }",
             OutputFormat::Svg,
             &RenderOptions::default(),

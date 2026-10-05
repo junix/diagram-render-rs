@@ -6,9 +6,9 @@ use diagram_ast_parser::ast::dbml::{
 
 use super::RenderPlan;
 use super::cards::{Card, CardDiagram, Connector, ConnectorKind};
-use crate::Theme;
+use crate::{Result, Theme};
 
-pub(crate) fn render(document: &DbmlDocument, theme: &Theme) -> RenderPlan {
+pub(crate) fn render(document: &DbmlDocument, theme: &Theme) -> Result<RenderPlan> {
     let title = document
         .items
         .iter()
@@ -143,10 +143,10 @@ pub(crate) fn render(document: &DbmlDocument, theme: &Theme) -> RenderPlan {
         });
     }
 
-    RenderPlan {
-        scene: super::cards::render(&mut diagram, theme),
+    Ok(RenderPlan {
+        scene: super::cards::render(&mut diagram, theme)?,
         warnings: inline_reference_warnings(document),
-    }
+    })
 }
 
 // Count authored settings, not missing edges: partials may be unused or reused,
