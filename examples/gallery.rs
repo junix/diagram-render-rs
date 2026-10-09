@@ -81,7 +81,7 @@ fn gallery_header() -> String {
     object,img{display:block;width:100%;height:auto;min-height:280px;max-height:720px;object-fit:contain;border-radius:12px;margin-top:18px;background-color:#fff;background-image:linear-gradient(45deg,#edf1f6 25%,transparent 25%),linear-gradient(-45deg,#edf1f6 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#edf1f6 75%),linear-gradient(-45deg,transparent 75%,#edf1f6 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0}
     details{margin-top:16px}summary{cursor:pointer}
     </style></head><body><header><h1>Typed AST → SVG / PNG</h1><p class="lead">Seven format-specific renderers share only a finite drawing scene and raster backend. The checkerboard exposes the transparent canvas contract.</p><div class="toolbar"><input id="filter" type="search" placeholder="Filter by name, format, or input file" aria-label="Filter diagrams"><span id="count" aria-live="polite">7 of 7 diagrams</span></div></header><main>"#
-    // Shared Catppuccin theme: Mocha dark by default, Latte light, auto/light/dark toggle.
+    // Shared Catppuccin theme: Mocha dark by default, apple.com-like light, auto/light/dark toggle.
     .replacen("</head>", &format!("{CATPPUCCIN_THEME}</head>"), 1)
 }
 
