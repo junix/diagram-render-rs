@@ -1,0 +1,25 @@
+{
+  "title": "diagram-render-rs",
+  "tagline": "One Rust rendering pipeline over authored DBML, WaveDrom, D2, Structurizr, LikeC4, nomnoml and Pikchr sources — SVG output with a 2x PNG proof per example.",
+  "rebuild": "just rust-gallery",
+  "backdrop": "checker",
+  "groups": [
+    {
+      "label": "Rendered",
+      "sources": ["examples/inputs/*"],
+      "titles": {
+        "schema": "DBML schema",
+        "timing": "WaveDrom timing",
+        "architecture": "D2 architecture",
+        "workspace": "Structurizr workspace",
+        "model": "LikeC4 model",
+        "classes": "nomnoml classes",
+        "flow": "Pikchr flow"
+      },
+      "artifacts": [
+        {"glob": "examples/rendered/{stem}.svg", "label": "SVG"},
+        {"glob": "examples/rendered/{stem}.png", "label": "2x PNG proof", "detail": true}
+      ]
+    }
+  ]
+}

@@ -60,6 +60,13 @@ examples:
 # examples/rendered/gallery.html via the same example run as `examples`.
 gallery: examples
 
+# Root gallery.html (gallery.json + tools/gallery.py) on top of the renders.
+rust-gallery: examples
+    python3 tools/gallery.py
+
+rust-gallery-check:
+    python3 tools/gallery.py --check
+
 doc:
     cargo doc --open
 

@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script>(function(){var s=null;try{s=localStorage.getItem('plot-gallery-theme');}catch(e){}var d=s==='dark'||s==='light'?s==='dark':matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.theme=d?'dark':'light';})();</script>
+<title>diagram-render-rs — gallery</title>
+<style>
+:root{color-scheme:light;
+  --bg:#fbfaf8;--panel:#fff;--ink:#16181d;--muted:#5f6570;--faint:#626b77;
+  --line:#e3e1dc;--accent:#2b6cb0;--chip:#f1f4f8;--code:#f6f5f2;
+  --shadow:0 1px 2px rgba(20,22,26,.05),0 8px 24px -12px rgba(20,22,26,.18);}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;
+  --bg:#0f1114;--panel:#161a1f;--ink:#e8eaee;--muted:#a2abb8;--faint:#8b96a6;
+  --line:#262c34;--accent:#63b3ed;--chip:#1d232a;--code:#12161a;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);}}
+:root[data-theme=dark]{color-scheme:dark;
+  --bg:#0f1114;--panel:#161a1f;--ink:#e8eaee;--muted:#a2abb8;--faint:#8b96a6;
+  --line:#262c34;--accent:#63b3ed;--chip:#1d232a;--code:#12161a;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);}
+:root[data-theme=light]{color-scheme:light;
+  --bg:#fbfaf8;--panel:#fff;--ink:#16181d;--muted:#5f6570;--faint:#626b77;
+  --line:#e3e1dc;--accent:#2b6cb0;--chip:#f1f4f8;--code:#f6f5f2;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Inter,system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease}
+.wrap{max-width:1240px;margin:0 auto;padding:48px 28px 90px}
+header{border-bottom:1px solid var(--line);padding-bottom:24px;margin-bottom:28px}
+h1{margin:0;font-size:30px;letter-spacing:-.02em;font-weight:650}
+.tagline{margin:10px 0 0;color:var(--muted);max-width:74ch}
+.pill-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.pill{font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);
+  background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+.pill b{color:var(--ink)}
+.controls{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:10px;
+  align-items:center;padding:12px 0;margin-bottom:26px;background:var(--bg);
+  box-shadow:0 1px 0 var(--line)}
+.controls input[type=search]{flex:1 1 220px;max-width:420px;border:1px solid var(--line);
+  border-radius:10px;background:var(--panel);color:var(--ink);padding:9px 13px;
+  font:inherit;font-size:14px}
+.controls input:focus-visible,.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font:12px/1 ui-monospace,Menlo,monospace;color:var(--muted);cursor:pointer;
+  background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+.chip span{color:var(--faint);margin-left:4px}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.chip[aria-pressed=true] span{color:var(--bg)}
+#count{margin-left:auto;color:var(--muted);font:12px/1 ui-monospace,Menlo,monospace;white-space:nowrap}
+.theme-btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);
+  border-radius:999px;padding:7px 16px;font:inherit;font-size:13px;cursor:pointer}
+.theme-btn:hover,.theme-btn:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+.theme-btn::after{content:"Light"}
+:root[data-theme=dark] .theme-btn::after{content:"Dark"}
+.grid{display:grid;gap:24px;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;
+  transition:background-color .25s ease,border-color .25s ease}
+.shots{display:flex;flex-direction:column;gap:10px;padding:14px 14px 0}
+.shot{position:relative;display:flex;align-items:center;justify-content:center;
+  min-height:160px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--bg)}
+.shot img{display:block;width:100%;height:auto;max-height:460px;object-fit:contain}
+.shot iframe{display:block;width:100%;border:0;background:var(--panel)}
+.shot.checker{background-color:#f2f1ee;background-image:
+  linear-gradient(45deg,#e2e0dc 25%,transparent 25%,transparent 75%,#e2e0dc 75%),
+  linear-gradient(45deg,#e2e0dc 25%,transparent 25%,transparent 75%,#e2e0dc 75%);
+  background-size:16px 16px;background-position:0 0,8px 8px}
+.shot.light{background:#fff}
+.shot.dark{background:#11151a}
+.shot figcaption{position:absolute;left:8px;top:8px;font:10px/1 ui-monospace,Menlo,monospace;
+  color:var(--muted);background:var(--panel);border:1px solid var(--line);
+  border-radius:999px;padding:3px 8px;opacity:.94;z-index:1}
+.shot figcaption.flag{left:auto;right:8px}
+.proof{padding:0 14px}
+.proof summary{position:static;border:0;padding:8px 0 2px}
+.missing{color:var(--faint);font-style:italic;font-size:13px;padding:40px 10px;text-align:center}
+.body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:9px;flex:1}
+.idx{font:11px/1 ui-monospace,Menlo,monospace;color:var(--faint);
+  letter-spacing:.08em;text-transform:uppercase}
+h2{margin:0;font-size:16px;font-weight:620;letter-spacing:-.01em}
+.blurb{margin:0;color:var(--muted);font-size:13.5px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font:11px/1 ui-monospace,Menlo,monospace;color:var(--muted);
+  background:var(--chip);border-radius:5px;padding:4px 7px}
+.links{display:flex;flex-wrap:wrap;gap:14px;margin-top:2px}
+.links a{color:var(--accent);font-size:12.5px;text-decoration:none}
+.links a:hover,.links a:focus-visible{text-decoration:underline}
+.card details{margin-top:auto;border-top:1px solid var(--line);padding-top:10px}
+.card details+details{border-top:0;margin-top:4px}
+.card details.proof{border-top:0;margin-top:0;padding:0}
+summary{cursor:pointer;font:12px/1 ui-monospace,Menlo,monospace;color:var(--accent);
+  list-style:none;user-select:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"\25b8 ";display:inline-block}
+details[open] summary::before{content:"\25be "}
+pre{margin:10px 0 0;background:var(--code);border:1px solid var(--line);border-radius:8px;
+  padding:12px 14px;overflow:auto;max-height:380px;
+  font:11.5px/1.55 ui-monospace,Menlo,monospace;color:var(--ink)}
+.codeblock{margin:0 14px}
+.codeblock pre{max-height:260px;margin:6px 0 0}
+#empty{display:none;margin:40px 0;color:var(--muted)}
+footer{margin-top:52px;padding-top:20px;border-top:1px solid var(--line);color:var(--faint);font-size:13px}
+footer code{background:var(--chip);border-radius:4px;padding:2px 6px;font:12px Menlo,monospace}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>diagram-render-rs</h1>
+    <p class="tagline">One Rust rendering pipeline over authored DBML, WaveDrom, D2, Structurizr, LikeC4, nomnoml and Pikchr sources — SVG output with a 2x PNG proof per example.</p>
+    <div class="pill-row"><span class="pill"><b>7</b> examples</span><span class="pill"><b>7</b> rendered</span></div>
+  </header>
+  <section class="controls" aria-label="Gallery filters">
+    <label class="sr" for="q">Filter examples</label>
+    <input id="q" type="search" placeholder="Filter by title, tag, group, or source content…" autocomplete="off">
+    
+    <output id="count" aria-live="polite">7 / 7 shown</output>
+    <button class="theme-btn" type="button" data-action="theme" aria-label="Switch colour theme" aria-pressed="false"></button>
+  </section>
+  <main class="grid">
+<article class="card" data-group="Rendered" data-search="d2 architecture  rendered  direction right client client api label payments api shape rectangle style fill eef4ff database label postgresql shape cylinder client - api https api - database sql style stroke-dash 3"><div class="shots"><figure class="shot checker"><figcaption>SVG</figcaption><img src="examples/rendered/architecture.svg" loading="lazy" alt="D2 architecture — SVG"></figure></div><details class="proof"><summary>Raster proof (1)</summary><figure class="shot light"><figcaption class="flag">2x PNG proof</figcaption><img src="examples/rendered/architecture.png" loading="lazy" alt="D2 architecture proof"></figure></details><div class="body"><div class="idx">01 · Rendered</div><h2>D2 architecture</h2><details><summary>examples/inputs/architecture.d2</summary><pre><code>direction: right
+
+client: Client
+api: {
+  label: Payments API
+  shape: rectangle
+  style.fill: &quot;#eef4ff&quot;
+}
+database: {
+  label: PostgreSQL
+  shape: cylinder
+}
+
+client -&gt; api: HTTPS
+api -&gt; database: SQL {
+  style.stroke-dash: 3
+}</code></pre></details></div></article>
+<article class="card" data-group="Rendered" data-search="nomnoml classes  rendered  direction right font inter service visual roundrect fill eef4ff actor id user user - service id api api charge result api -- database id db postgresql payments customers"><div class="shots"><figure class="shot checker"><figcaption>SVG</figcaption><img src="examples/rendered/classes.svg" loading="lazy" alt="nomnoml classes — SVG"></figure></div><details class="proof"><summary>Raster proof (1)</summary><figure class="shot light"><figcaption class="flag">2x PNG proof</figcaption><img src="examples/rendered/classes.png" loading="lazy" alt="nomnoml classes proof"></figure></details><div class="body"><div class="idx">02 · Rendered</div><h2>nomnoml classes</h2><details><summary>examples/inputs/classes.nomnoml</summary><pre><code>#direction: right
+#font: Inter
+#.service: visual=roundrect fill=#eef4ff
+
+[&lt;actor id=user&gt;User] -&gt; [&lt;service id=api&gt;API|+charge(): Result]
+[api] --&gt; [&lt;database id=db&gt;PostgreSQL|payments; customers]</code></pre></details></div></article>
+<article class="card" data-group="Rendered" data-search="pikchr flow  rendered  right client box client fit arrow right 150 api box api rust fit arrow right 150 db cylinder postgresql fit spacing 0 2in"><div class="shots"><figure class="shot checker"><figcaption>SVG</figcaption><img src="examples/rendered/flow.svg" loading="lazy" alt="Pikchr flow — SVG"></figure></div><details class="proof"><summary>Raster proof (1)</summary><figure class="shot light"><figcaption class="flag">2x PNG proof</figcaption><img src="examples/rendered/flow.png" loading="lazy" alt="Pikchr flow proof"></figure></details><div class="body"><div class="idx">03 · Rendered</div><h2>Pikchr flow</h2><details><summary>examples/inputs/flow.pikchr</summary><pre><code>right
+Client: box &quot;Client&quot; fit
+arrow right 150%
+Api: box &quot;API&quot; &quot;(Rust)&quot; fit
+arrow right 150%
+Db: cylinder &quot;PostgreSQL&quot; fit
+spacing = 0.2in</code></pre></details></div></article>
+<article class="card" data-group="Rendered" data-search="likec4 model  rendered  specification element actor element system element component relationship async model customer actor customer cloud system cloud api component api worker component worker api - async - worker publishes jobs customer - cloud uses views view index title cloud overview include"><div class="shots"><figure class="shot checker"><figcaption>SVG</figcaption><img src="examples/rendered/model.svg" loading="lazy" alt="LikeC4 model — SVG"></figure></div><details class="proof"><summary>Raster proof (1)</summary><figure class="shot light"><figcaption class="flag">2x PNG proof</figcaption><img src="examples/rendered/model.png" loading="lazy" alt="LikeC4 model proof"></figure></details><div class="body"><div class="idx">04 · Rendered</div><h2>LikeC4 model</h2><details><summary>examples/inputs/model.c4</summary><pre><code>specification {
+  element actor
+  element system
+  element component
+  relationship async
+}
+
+model {
+  customer = actor &#x27;Customer&#x27;
+  cloud = system &#x27;Cloud&#x27; {
+    api = component &#x27;API&#x27;
+    worker = component &#x27;Worker&#x27;
+    api -[async]-&gt; worker &#x27;publishes jobs&#x27;
+  }
+  customer -&gt; cloud &#x27;Uses&#x27;
+}
+
+views {
+  view index {
+    title &#x27;Cloud overview&#x27;
+    include *
+  }
+}</code></pre></details></div></article>
+<article class="card" data-group="Rendered" data-search="dbml schema  rendered  project commerce database_type postgresql note core commerce schema table public users as u note accounts id bigint pk increment email varchar 255 not null unique status public user_status not null default active created_at timestamp default now indexes email name users_email_idx unique status created_at name users_status_created_idx table public orders id bigint pk user_id bigint not null total decimal 12 2 not null enum public user_status active disabled note login disabled ref user_orders pub"><div class="shots"><figure class="shot checker"><figcaption>SVG</figcaption><img src="examples/rendered/schema.svg" loading="lazy" alt="DBML schema — SVG"></figure></div><details class="proof"><summary>Raster proof (1)</summary><figure class="shot light"><figcaption class="flag">2x PNG proof</figcaption><img src="examples/rendered/schema.png" loading="lazy" alt="DBML schema proof"></figure></details><div class="body"><div class="idx">05 · Rendered</div><h2>DBML schema</h2><details><summary>examples/inputs/schema.dbml</summary><pre><code>Project commerce {
+  database_type: &#x27;PostgreSQL&#x27;
+  Note: &#x27;Core commerce schema&#x27;
+}
+
+Table public.users as U [note: &#x27;Accounts&#x27;] {
+  id bigint [pk, increment]
+  email varchar(255) [not null, unique]
+  status public.user_status [not null, default: &#x27;active&#x27;]
+  created_at timestamp [default: `now()`]
+
+  Indexes {
+    email [name: &#x27;users_email_idx&#x27;, unique]
+    (status, created_at) [name: &#x27;users_status_created_idx&#x27;]
+  }
+}
+
+Table public.orders {
+  id bigint [pk]
+  user_id bigint [not null]
+  total decimal(12, 2) [not null]
+}
+
+Enum public.user_status {
+  active
+  disabled [note: &#x27;Login disabled&#x27;]
+}
+
+Ref user_orders: public.users.id &lt; public.orders.user_id [delete: cascade]</code></pre></details></div></article>
+<article class="card" data-group="Rendered" data-search="wavedrom timing  rendered  signal name clk wave p bus name data wave x 345x data head body tail name valid wave 0 1 0 node a b edge a b transfer head text bus transaction tick 0 every 2 config hscale 2"><div class="shots"><figure class="shot checker"><figcaption>SVG</figcaption><img src="examples/rendered/timing.svg" loading="lazy" alt="WaveDrom timing — SVG"></figure></div><details class="proof"><summary>Raster proof (1)</summary><figure class="shot light"><figcaption class="flag">2x PNG proof</figcaption><img src="examples/rendered/timing.png" loading="lazy" alt="WaveDrom timing proof"></figure></details><div class="body"><div class="idx">06 · Rendered</div><h2>WaveDrom timing</h2><details><summary>examples/inputs/timing.json5</summary><pre><code>{
+  signal: [
+    { name: &#x27;clk&#x27;, wave: &#x27;p.......&#x27; },
+    [
+      &#x27;bus&#x27;,
+      { name: &#x27;data&#x27;, wave: &#x27;x.345x..&#x27;, data: [&#x27;head&#x27;, &#x27;body&#x27;, &#x27;tail&#x27;] },
+      { name: &#x27;valid&#x27;, wave: &#x27;0.1..0..&#x27;, node: &#x27;..a..b..&#x27; },
+    ],
+  ],
+  edge: [&#x27;a~&gt;b transfer&#x27;],
+  head: { text: &#x27;Bus transaction&#x27;, tick: 0, every: 2 },
+  config: { hscale: 2 },
+}</code></pre></details></div></article>
+<article class="card" data-group="Rendered" data-search="structurizr workspace  rendered  workspace payments structurizr parser example identifiers hierarchical model customer person customer payments softwaresystem payments api container api handles payment requests rust database container database stores payments postgresql api - database reads from and writes to sql customer - payments uses views systemcontext payments context include autolayout lr container payments containers include autolayout lr"><div class="shots"><figure class="shot checker"><figcaption>SVG</figcaption><img src="examples/rendered/workspace.svg" loading="lazy" alt="Structurizr workspace — SVG"></figure></div><details class="proof"><summary>Raster proof (1)</summary><figure class="shot light"><figcaption class="flag">2x PNG proof</figcaption><img src="examples/rendered/workspace.png" loading="lazy" alt="Structurizr workspace proof"></figure></details><div class="body"><div class="idx">07 · Rendered</div><h2>Structurizr workspace</h2><details><summary>examples/inputs/workspace.dsl</summary><pre><code>workspace &quot;Payments&quot; &quot;Structurizr parser example&quot; {
+  !identifiers hierarchical
+
+  model {
+    customer = person &quot;Customer&quot;
+    payments = softwareSystem &quot;Payments&quot; {
+      api = container &quot;API&quot; &quot;Handles payment requests&quot; &quot;Rust&quot;
+      database = container &quot;Database&quot; &quot;Stores payments&quot; &quot;PostgreSQL&quot;
+      api -&gt; database &quot;Reads from and writes to&quot; &quot;SQL&quot;
+    }
+    customer -&gt; payments &quot;Uses&quot;
+  }
+
+  views {
+    systemContext payments &quot;context&quot; {
+      include *
+      autoLayout lr
+    }
+    container payments &quot;containers&quot; {
+      include *
+      autoLayout lr
+    }
+  }
+}</code></pre></details></div></article>
+  </main>
+  <p id="empty">No examples match the current filter.</p>
+  <footer>Generated by <code>tools/gallery.py</code> — rebuild with <code>just rust-gallery</code>. Previews are relative paths committed with the repo.</footer>
+</div>
+<script>
+(function(){
+var root=document.documentElement,
+btn=document.querySelector('[data-action=theme]'),
+q=document.getElementById('q'),count=document.getElementById('count'),
+empty=document.getElementById('empty'),
+cards=[].slice.call(document.querySelectorAll('.card')),
+chips=[].slice.call(document.querySelectorAll('.chip')),group='';
+function apply(){
+var t=q.value.trim().toLowerCase(),n=0;
+cards.forEach(function(c){
+var ok=(!group||c.dataset.group===group)&&(!t||(c.dataset.search||'').toLowerCase().indexOf(t)>=0);
+c.style.display=ok?'':'none';if(ok)n++;});
+count.textContent=n+' / '+cards.length+' shown';
+empty.style.display=n?'none':'block';
+chips.forEach(function(ch){ch.setAttribute('aria-pressed',String(ch.dataset.group===group));});
+}
+btn.addEventListener('click',function(){
+var next=root.dataset.theme==='dark'?'light':'dark';
+root.dataset.theme=next;try{localStorage.setItem('plot-gallery-theme',next);}catch(e){}
+});
+chips.forEach(function(ch){ch.addEventListener('click',function(){
+var g=ch.dataset.group;group=(g===group)?'':g;apply();});});
+q.addEventListener('input',apply);apply();
+})();
+</script>
+</body>
+</html>

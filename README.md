@@ -176,6 +176,9 @@ The editable inputs live under [`examples/inputs`](examples/inputs). Generate
 seven SVGs, seven 2× PNGs, and the responsive visual gallery
 [`examples/rendered/gallery.html`](examples/rendered/gallery.html) with:
 
+Root gallery: [gallery.html](gallery.html) — all seven examples on one page (regenerate with `just rust-gallery`). The older per-render page remains at examples/rendered/gallery.html.
+
+
 ```console
 just gallery
 open examples/rendered/gallery.html
