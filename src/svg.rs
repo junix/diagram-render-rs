@@ -107,6 +107,7 @@ fn write_primitive(svg: &mut String, primitive: &Primitive) {
         Primitive::Text {
             at,
             text,
+            full_text,
             size,
             anchor,
             color,
@@ -123,9 +124,10 @@ fn write_primitive(svg: &mut String, primitive: &Primitive) {
                 TextWeight::Bold => "650",
             };
             let style = if *italic { "italic" } else { "normal" };
+            let full_text = full_text.as_deref().filter(|full| *full != text.as_str());
             let _ = write!(
                 svg,
-                r#"<text x="{:.2}" y="{:.2}" font-size="{:.2}" text-anchor="{}" dominant-baseline="middle" fill="{}" font-weight="{}" font-style="{}">{}</text>"#,
+                r#"<text x="{:.2}" y="{:.2}" font-size="{:.2}" text-anchor="{}" dominant-baseline="middle" fill="{}" font-weight="{}" font-style="{}""#,
                 at.x,
                 at.y,
                 size,
@@ -133,8 +135,15 @@ fn write_primitive(svg: &mut String, primitive: &Primitive) {
                 escape_attr(color),
                 weight,
                 style,
-                escape_text(text)
             );
+            if let Some(full) = full_text {
+                let _ = write!(svg, r#" aria-label="{}""#, escape_attr(full));
+            }
+            svg.push('>');
+            if let Some(full) = full_text {
+                let _ = write!(svg, "<title>{}</title>", escape_text(full));
+            }
+            let _ = write!(svg, "{}</text>", escape_text(text));
         }
     }
 }

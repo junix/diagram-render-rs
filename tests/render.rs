@@ -178,6 +178,63 @@ fn svg_text_is_xml_escaped() {
 }
 
 #[test]
+fn truncated_card_labels_remain_recoverable_in_svg() {
+    let title = "很长的实体名称 <需要> 截断 & 完整恢复";
+    let label = "漫长的关系标签超过三十四个显示宽度单位因此会被截断处理";
+    let source = format!("a: \"{title}\"\nb: \"short\"\na -> b: \"{label}\"");
+    let rendered = render_source(
+        DiagramFormat::D2,
+        &source,
+        OutputFormat::Svg,
+        &RenderOptions::default(),
+    )
+    .expect("render");
+
+    // The complete labels survive as escaped accessible payloads (the D2
+    // parser keeps the quoting inside the label value).
+    let full_title = "\"很长的实体名称 &lt;需要&gt; 截断 &amp; 完整恢复\"";
+    let full_label = format!("\"{label}\"");
+    assert!(
+        rendered
+            .svg
+            .contains(&format!("<title>{full_title}</title>"))
+    );
+    assert!(rendered.svg.contains(&format!(
+        "aria-label=\"{}\"",
+        full_title.replace('"', "&quot;")
+    )));
+    assert!(
+        rendered
+            .svg
+            .contains(&format!("<title>{full_label}</title>"))
+    );
+    assert!(rendered.svg.contains(&format!(
+        "aria-label=\"{}\"",
+        full_label.replace('"', "&quot;")
+    )));
+
+    // Visible text stays abbreviated: only the two long labels carry payloads.
+    assert!(rendered.svg.contains("…</text>"));
+    assert_eq!(rendered.svg.matches("aria-label=").count(), 2);
+    assert_eq!(rendered.svg.matches("<title>").count(), 2);
+    assert!(!rendered.svg.contains(&format!(">{full_label}</text>")));
+    assert!(!rendered.svg.contains(title));
+    assert!(rendered.svg.contains(">\"short\"</text>"));
+
+    // The PNG pipeline accepts the accessibility payloads and stays compact.
+    let png = render_source(
+        DiagramFormat::D2,
+        &source,
+        OutputFormat::Png,
+        &RenderOptions::default(),
+    )
+    .expect("render PNG");
+    let pixmap =
+        resvg::tiny_skia::Pixmap::decode_png(&png.png.expect("PNG requested")).expect("valid PNG");
+    assert!(pixmap.width() > 100 && pixmap.height() > 100);
+}
+
+#[test]
 fn implemented_feature_surface_retains_value_sensitive_details() {
     let dbml = render_source(
         DiagramFormat::Dbml,

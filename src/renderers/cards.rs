@@ -219,9 +219,9 @@ fn draw_connectors(
             .label
             .as_deref()
             .filter(|label| !label.is_empty())
-            .map(|label| truncate(label, 34));
-        let label_width = label.as_deref().map_or(0.0, |label| {
-            (label.width() as f32 * 7.1 + 18.0).clamp(46.0, 250.0)
+            .map(|label| (truncate(label, 34), label));
+        let label_width = label.as_ref().map_or(0.0, |(visible, _)| {
+            (visible.width() as f32 * 7.1 + 18.0).clamp(46.0, 250.0)
         });
         let legacy = connector_points(from_rect, to_rect, label_width);
         let (points, label_center) =
@@ -250,7 +250,7 @@ fn draw_connectors(
         ) {
             draw_arrowhead(scene, start, start_neighbor, &theme.line);
         }
-        if let Some(label) = label {
+        if let Some((visible, full)) = label {
             let middle = label_center.expect("a labeled route has a checked label center");
             scene.push(Primitive::Rect {
                 rect: Rect::new(
@@ -264,10 +264,11 @@ fn draw_connectors(
                 fill_opacity: 0.98,
                 stroke: Some(Stroke::solid(theme.grid.clone(), 1.0)),
             });
-            push_text(
+            push_text_with_full_text(
                 scene,
                 middle,
-                &label,
+                &visible,
+                full,
                 11.5,
                 TextAnchor::Middle,
                 &theme.foreground,
@@ -316,10 +317,11 @@ fn draw_card(scene: &mut Scene, card: &Card, rect: Rect, lines: &[String], theme
         &theme.muted,
         TextWeight::Bold,
     );
-    push_text(
+    push_text_with_full_text(
         scene,
         Point::new(rect.x + 18.0, rect.y + 40.0),
         &truncate(&card.title, 31),
+        &card.title,
         16.0,
         TextAnchor::Start,
         &theme.foreground,
@@ -468,6 +470,31 @@ pub(crate) fn push_text(
     scene.push(Primitive::Text {
         at,
         text: text.to_owned(),
+        full_text: None,
+        size,
+        anchor,
+        color: color.to_owned(),
+        weight,
+        italic: false,
+    });
+}
+
+/// Records `full_text` alongside the visible abbreviation so backends can
+/// attach recoverable accessible labels for truncated text.
+pub(crate) fn push_text_with_full_text(
+    scene: &mut Scene,
+    at: Point,
+    text: &str,
+    full_text: &str,
+    size: f32,
+    anchor: TextAnchor,
+    color: &str,
+    weight: TextWeight,
+) {
+    scene.push(Primitive::Text {
+        at,
+        text: text.to_owned(),
+        full_text: (text != full_text).then(|| full_text.to_owned()),
         size,
         anchor,
         color: color.to_owned(),

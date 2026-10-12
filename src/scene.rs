@@ -122,6 +122,10 @@ pub enum Primitive {
     Text {
         at: Point,
         text: String,
+        /// Complete label when `text` was abbreviated for display, so backends
+        /// can attach recoverable accessible labels. `None` when `text` is
+        /// already the full label.
+        full_text: Option<String>,
         size: f32,
         anchor: TextAnchor,
         color: String,
