@@ -481,6 +481,7 @@ pub(crate) fn push_text(
 
 /// Records `full_text` alongside the visible abbreviation so backends can
 /// attach recoverable accessible labels for truncated text.
+#[allow(clippy::too_many_arguments)] // Same explicit text parameters as `push_text` plus the full label.
 pub(crate) fn push_text_with_full_text(
     scene: &mut Scene,
     at: Point,
